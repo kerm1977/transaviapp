@@ -1,1 +1,238 @@
-<!-- register.html -->
+{% extends "base.html" %}
+
+{% block title %}Registro de Usuario{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+    <h1 style="text-align: center; color: var(--clr-main); margin-bottom: 25px;">Crear Cuenta</h1>
+    
+    <form method="POST" action="{{ url_for('auth.register') }}">
+        
+        <!-- Nombre: Solo letras. Se aplica Title Case automáticamente. -->
+        <div class="input-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ form_data.nombre or '' }}" 
+                   pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ]+" 
+                   oninput="validateName(this)" required>
+            <!-- <small id="error-nombre" style="color: #f44336; display: none;">Solo letras (sin espacios ni caracteres especiales).</small> ELIMINADA -->
+        </div>
+
+        <!-- Primer Apellido: Solo letras. Se aplica Title Case automáticamente. -->
+        <div class="input-group">
+            <label for="apellido1">Primer Apellido:</label>
+            <input type="text" id="apellido1" name="apellido1" value="{{ form_data.apellido1 or '' }}" 
+                   pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ]+" 
+                   oninput="validateName(this)" required>
+            <!-- <small id="error-apellido1" style="color: #f44336; display: none;">Solo letras (sin espacios ni caracteres especiales).</small> ELIMINADA -->
+        </div>
+
+        <!-- Segundo Apellido: Solo letras. Se aplica Title Case automáticamente. (Opcional) -->
+        <div class="input-group">
+            <label for="apellido2">Segundo Apellido (Opcional):</label>
+            <input type="text" id="apellido2" name="apellido2" value="{{ form_data.apellido2 or '' }}" 
+                   pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ]*" 
+                   oninput="validateName(this)">
+            <!-- <small id="error-apellido2" style="color: #f44336; display: none;">Solo letras (sin espacios ni caracteres especiales).</small> ELIMINADA -->
+        </div>
+        
+        <!-- Teléfono: Solo números, 8 caracteres exactos. -->
+        <div class="input-group">
+            <label for="telefono">Teléfono (8 dígitos):</label>
+            <input type="text" id="telefono" name="telefono" value="{{ form_data.telefono or '' }}" 
+                   maxlength="8" 
+                   oninput="validatePhone(this)" required>
+            <!-- <small id="error-telefono" style="color: #f44336; display: none;">Debe ser exactamente 8 dígitos numéricos.</small> ELIMINADA -->
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ form_data.email or '' }}" required>
+        </div>
+        
+        <!-- Usuario: Máximo 10 caracteres. Muestra el estado de validez (check/cross). -->
+        <div class="input-group">
+            <label for="usuario">Usuario (Máx. 10):</label>
+            <input type="text" id="usuario" name="usuario" value="{{ form_data.usuario or '' }}" 
+                   maxlength="10" 
+                   oninput="validateUsername(this)" required>
+            <span id="validation-icon-usuario" style="position: absolute; right: 10px; top: 50%; transform: translateY(10px); font-size: 1.2em; color: gray;">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+            </span>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="input-group">
+            <label for="password">Contraseña:</label>
+            <input type="password" id="password" name="password" oninput="checkPasswords()" required>
+            <span class="toggle-password" onclick="togglePasswordVisibility('password', 'icon-password')">
+                <ion-icon name="eye-off-outline" id="icon-password"></ion-icon>
+            </span>
+        </div>
+
+        <!-- Verificar Contraseña: Se eliminó el ícono de validación. -->
+        <div class="input-group">
+            <label for="password_confirm">Verificar Contraseña:</label>
+            <input type="password" id="password_confirm" name="password_confirm" oninput="checkPasswords()" required>
+            <span class="toggle-password" onclick="togglePasswordVisibility('password_confirm', 'icon-password_confirm')">
+                <ion-icon name="eye-off-outline" id="icon-password_confirm"></ion-icon>
+            </span>
+            <!-- <span id="validation-icon-passwords" ... > ELIMINADO -->
+        </div>
+
+        <button type="submit" class="btn-primary" id="register-btn" disabled>Registrarme</button>
+        
+    </form>
+    
+    <p style="text-align: center; margin-top: 20px; font-size: 0.9em;">
+        ¿Ya tengo una cuenta? 
+        <a href="{{ url_for('auth.login') }}" style="color: var(--clr-main); text-decoration: none; font-weight: bold;">Iniciar sesión</a>
+    </p>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // =======================================================
+    // JS para Validaciones de Cliente
+    // =======================================================
+    
+    // Almacena el estado de todas las validaciones (incluimos email como básico)
+    const validationState = {
+        nombre: false,
+        apellido1: false,
+        telefono: false,
+        usuario: false,
+        email: false, // Añadido para asegurar la validación básica del email
+        passwords: false
+    };
+
+    const emailInput = document.getElementById('email');
+    emailInput.addEventListener('input', () => {
+        // Valida el email básico (si tiene formato de email)
+        validationState.email = emailInput.checkValidity();
+        updateButtonState();
+    });
+
+    function updateButtonState() {
+        const btn = document.getElementById('register-btn');
+        // El botón solo es válido si TODAS las validaciones son TRUE
+        const isValid = Object.values(validationState).every(v => v === true);
+        btn.disabled = !isValid;
+        
+        // Efecto visual en el botón
+        if (isValid) {
+            btn.style.opacity = '1';
+        } else {
+            btn.style.opacity = '0.7';
+        }
+    }
+    
+    // 1. Mostrar/Ocultar Contraseña
+    // Ahora recibe el ID del campo de input y el ID del icono directamente.
+    function togglePasswordVisibility(fieldId, iconId) {
+        const field = document.getElementById(fieldId);
+        const icon = document.getElementById(iconId);
+
+        if (field.type === "password") {
+            field.type = "text";
+            icon.name = "eye-outline";
+        } else {
+            field.type = "password";
+            icon.name = "eye-off-outline";
+        }
+    }
+    
+    // 2. Validación de Nombre/Apellido (Solo letras, sin espacios, Title Case)
+    function validateName(input) {
+        // Expresión para solo letras (incluyendo acentos y Ñ)
+        const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+$/;
+        
+        let isValid = true;
+        
+        if (input.name === 'apellido2' && input.value.trim() === '') {
+            isValid = true;
+        } else if (!regex.test(input.value)) {
+            isValid = false;
+        } else if (input.value.length === 0 && input.name !== 'apellido2') {
+             isValid = false;
+        }
+
+        // Aplica restricción inmediata: elimina cualquier caracter que no sea letra
+        input.value = input.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ]/g, '');
+
+        // Aplica formato Title Case al texto limpio
+        if (input.value.length > 0) {
+             input.value = input.value.charAt(0).toUpperCase() + input.value.slice(1).toLowerCase();
+        }
+
+        // Actualizar estado solo para campos obligatorios
+        if (input.id !== 'apellido2') {
+            validationState[input.id] = isValid && input.value.length > 0;
+        }
+        updateButtonState();
+    }
+    
+    // 3. Validación de Teléfono (8 dígitos numéricos exactos)
+    function validatePhone(input) {
+        // Aplica restricción inmediata: solo números
+        input.value = input.value.replace(/[^0-9]/g, '');
+        
+        // Debe ser de 8 caracteres
+        const isValid = input.value.length === 8; 
+
+        validationState.telefono = isValid;
+        updateButtonState();
+    }
+    
+    // 4. Validación de Usuario (Máx 10 caracteres)
+    function validateUsername(input) {
+        const iconElement = document.getElementById('validation-icon-usuario');
+        const maxLen = 10;
+        
+        // Válido si tiene entre 1 y 10 caracteres
+        const isLengthValid = input.value.length > 0 && input.value.length <= maxLen;
+        
+        if (isLengthValid) {
+            iconElement.innerHTML = '<ion-icon name="checkmark-circle-outline"></ion-icon>';
+            iconElement.style.color = '#4caf50'; // Verde
+        } else {
+            iconElement.innerHTML = '<ion-icon name="close-circle-outline"></ion-icon>';
+            iconElement.style.color = '#f44336'; // Rojo
+        }
+        
+        validationState.usuario = isLengthValid;
+        updateButtonState();
+    }
+
+    // 5. Validación de Contraseñas
+    function checkPasswords() {
+        const password = document.getElementById('password').value;
+        const passwordConfirm = document.getElementById('password_confirm').value;
+        // Se elimina la referencia al icono de validación de contraseñas.
+        
+        // Coinciden y no están vacías
+        const passwordsMatch = password === passwordConfirm && password.length > 0;
+
+        // Antes se actualizaba el icono, ahora solo se actualiza el estado interno:
+        validationState.passwords = passwordsMatch;
+        updateButtonState();
+    }
+    
+    // Inicializar estado de validación al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ejecutar validaciones iniciales si hay datos precargados (después de un error de Flask)
+        validateName(document.getElementById('nombre'));
+        validateName(document.getElementById('apellido1'));
+        validatePhone(document.getElementById('telefono'));
+        validateUsername(document.getElementById('usuario'));
+        checkPasswords();
+        
+        // Inicializa validación de email si tiene valor
+        emailInput.dispatchEvent(new Event('input'));
+        
+        updateButtonState();
+    });
+</script>
+{% endblock %}

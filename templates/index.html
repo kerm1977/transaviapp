@@ -1,1 +1,31 @@
 <!-- index.html -->
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col items-center justify-center min-h-[50vh] text-center">
+        <h1 style="font-size: 2.5em; margin-bottom: 20px; color: var(--clr-main);">
+            <ion-icon name="checkmark-circle-outline" style="vertical-align: middle;"></ion-icon>
+            Bienvenido, {{ session.get('full_name', session.get('username', 'Usuario')) }}
+        </h1>
+        
+        <p style="font-size: 1.1em; margin-bottom: 30px; color: var(--clr-text-content);">
+            Has iniciado sesión correctamente. Esta es la página principal (index.html).
+        </p>
+        
+        <div style="padding: 15px; background: var(--clr-card-bg); border-radius: 10px;">
+            <p style="font-size: 0.9em; color: var(--clr-warning);">
+                *Tu nombre de usuario es: <strong>{{ session.get('username', 'N/A') }}</strong>
+            </p>
+            <p style="font-size: 0.9em; color: var(--clr-warning);">
+                *Tu nombre completo es: <strong>{{ session.get('full_name', 'N/A') }}</strong>
+            </p>
+        </div>
+        
+        <a href="{{ url_for('auth.logout') }}" style="margin-top: 30px; color: #fff; background: #dc3545; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            Cerrar Sesión
+        </a>
+    </div>
+
+{% endblock %}

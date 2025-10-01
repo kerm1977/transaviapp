@@ -8,6 +8,10 @@
     <!-- Importar ionicons para los iconos -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    
+    <!-- Incluir jQuery para las funcionalidades de Flash (opcional pero ayuda) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
 
     <!-- ======================================================= -->
     <!-- ESTILOS CSS INLINE (Responsivo y Fijo en el Pie) -->
@@ -75,18 +79,58 @@
             padding-bottom: var(--nav-height); /* Añade padding para que el contenido no se oculte detrás del navbar */
             transition: background 0.3s; /* Suaviza el cambio de fondo del body */
         }
+        
+        /* Contenedor de Flashes */
+        .flash-messages {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 400px;
+            z-index: 1002;
+            padding-top: 50px;
+        }
 
-        /* Botón de cambio de tema */
+        .flash-message {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            opacity: 0.95;
+        }
+
+        .flash-success { background-color: #4CAF50; color: white; }
+        .flash-danger { background-color: #f44336; color: white; }
+        .flash-warning { background-color: #ff9800; color: white; }
+        .flash-info { background-color: #2196F3; color: white; }
+
+
+        /* Botón de cambio de tema y usuario */
+        .nav-header-info {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nav-header-info span {
+            color: var(--clr-text-content);
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+
         #theme-toggle {
             /* Posicionamiento y Estilo */
-            position: fixed;
-            top: 15px; /* Más cerca de la esquina */
-            right: 15px; /* Más cerca de la esquina */
             background: none;
             border: none;
             color: var(--clr-text-content); /* Color del ícono basado en el tema */
             cursor: pointer;
-            z-index: 1001;
             padding: 10px;
             font-size: 1.8em; /* Tamaño del ícono */
             line-height: 1;
@@ -255,58 +299,172 @@
             padding: 20px;
             color: var(--clr-text-content); /* El texto del contenido cambia según el tema */
             text-align: center;
-            font-size: 1.2em;
+            /* Asegura que el contenido no quede debajo del footer */
+            min-height: calc(100vh - var(--nav-height));
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
             transition: color 0.3s;
         }
         .content h1 {
             margin-bottom: 20px;
         }
+        
+        /* Estilos para formularios de Login/Registro */
+        .auth-card {
+            background: var(--clr-nav-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 380px;
+            margin-top: 50px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--clr-text-content);
+            font-weight: 500;
+        }
+
+        .input-group input[type="text"],
+        .input-group input[type="password"],
+        .input-group input[type="email"] {
+            width: 100%;
+            padding: 12px 40px 12px 15px; /* Más padding a la derecha para el ícono */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: var(--clr-bg);
+            color: var(--clr-text-content);
+            transition: border-color 0.3s;
+        }
+        
+        .input-group input:focus {
+            border-color: var(--clr-main);
+            outline: none;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(2px); /* Ajuste fino */
+            cursor: pointer;
+            color: #888;
+        }
+        .toggle-password:hover {
+            color: var(--clr-main);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--clr-main);
+            color: #000;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: opacity 0.3s, background-color 0.3s;
+            opacity: 1;
+        }
+        
+        .btn-primary:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Estilos para mensajes Flash */
+        .alert {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .alert-success { background-color: #d4edda; color: #155724; }
+        .alert-danger { background-color: #f8d7da; color: #721c24; }
+        .alert-info { background-color: #d1ecf1; color: #0c5460; }
+        .alert-warning { background-color: #fff3cd; color: #856404; }
+
     </style>
 </head>
 
+<!-- El tema se establece dinámicamente -->
 <body class="theme-dark"> 
+    
+    <!-- Contenedor para mensajes flash -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
 
-    <!-- Botón de cambio de tema: Ahora es un ícono de configuración -->
-    <!-- eSTE BOTÓN NO SE PUEDE MOVER DE AQUI NI MODIFICAR  ABSOLUTAMENTE NADA DE EL  -->
-    <button id="theme-toggle" title="Cambiar Tema">
-        <ion-icon name="color-palette-outline"></ion-icon>
-    </button>
 
-    <!-- Contenido de ejemplo (simula el cuerpo de la página) -->
+    <!-- Barra Superior: Muestra el nombre del usuario y el botón de tema -->
+    <div class="nav-header-info">
+        <!-- Mostrar nombre del usuario si está logueado -->
+        {% if session.logged_in %}
+            <span>Hola, {{ session.full_name.split(' ')[0] }}</span>
+            <a href="{{ url_for('auth.logout') }}" title="Cerrar Sesión" style="color: var(--clr-warning); font-size: 1.5em;">
+                <ion-icon name="log-out-outline"></ion-icon>
+            </a>
+        {% else %}
+            <!-- Si no está logueado, se deja vacío o se pone un placeholder, pero el botón de tema permanece -->
+        {% endif %}
+
+        <!-- Botón de cambio de tema: AQUI NO SE PUEDE MOVER NI MODIFICAR ABSOLUTAMENTE NADA DE EL  -->
+        <button id="theme-toggle" title="Cambiar Tema">
+            <ion-icon name="color-palette-outline"></ion-icon>
+        </button>
+    </div>
+
+    <!-- Contenido de la vista (Index, Login, Register, etc.) -->
     <div class="content">
-        <h1>Bienvenido a la Web Móvil</h1>
-        <p>Esta es una simulación de contenido de aplicación móvil.</p>
-        <p>Usa el ícono de paleta de colores en la esquina para cambiar el tema.</p>
-        <p>Redimensiona la ventana del navegador para ver el efecto responsivo.</p>
-        <div style="height: 60vh;"></div> <!-- Espacio para simular scroll -->
-        <p>Fin del contenido.</p>
+        {% block content %}{% endblock %}
     </div>
 
 
     <!-- ======================================================= -->
-    <!-- ESTRUCTURA HTML -->
+    <!-- ESTRUCTURA HTML - NAVBAR INFERIOR (SIEMPRE VISIBLE) -->
     <!-- ======================================================= -->
     <div class="navigation">
         <ul>
             <!-- Elementos de la lista -->
             <li class="list active" data-icon-name="home-outline">
-                <a href="#">
+                <a href="{{ url_for('main.index') }}">
                     <span class="icon">
                         <ion-icon name="home-outline"></ion-icon>
                     </span>
                     <span class="text">Inicio</span>
                 </a>
             </li>
+            
+            <!-- ENLACE DINÁMICO DE PERFIL/LOGIN -->
             <li class="list" data-icon-name="person-outline">
-                <a href="#">
+                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}">
                     <span class="icon">
                         <ion-icon name="person-outline"></ion-icon>
                     </span>
-                    <span class="text">Perfil</span>
+                    <span class="text">
+                        {% if session.logged_in %}Perfil{% else %}Acceder{% endif %}
+                    </span>
                 </a>
             </li>
+            
+            <!-- Estos enlaces solo funcionan si se está logueado -->
             <li class="list" data-icon-name="chatbubble-outline">
-                <a href="#">
+                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
                     <span class="icon">
                         <ion-icon name="chatbubble-outline"></ion-icon>
                     </span>
@@ -314,7 +472,7 @@
                 </a>
             </li>
             <li class="list" data-icon-name="camera-outline">
-                <a href="#">
+                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
                     <span class="icon">
                         <ion-icon name="camera-outline"></ion-icon>
                     </span>
@@ -322,7 +480,7 @@
                 </a>
             </li>
             <li class="list" data-icon-name="settings-outline">
-                <a href="#">
+                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
                     <span class="icon">
                         <ion-icon name="settings-outline"></ion-icon>
                     </span>
@@ -337,6 +495,8 @@
         </ul>
     </div>
 
+    {% block scripts %}{% endblock %}
+
     <!-- ======================================================= -->
     <!-- COMPORTAMIENTO JAVASCRIPT (Responsivo, Centrado y Temas) -->
     <!-- ======================================================= -->
@@ -346,54 +506,64 @@
         const body = document.body;
         const themeToggleButton = document.getElementById('theme-toggle');
 
-        // Definición de los temas y sus nombres visibles
+        // Función para manejar el clic en enlaces protegidos (si no está logueado)
+        function handleNavClick(event) {
+            const loggedIn = "{{ session.logged_in | default('False') }}" === 'True';
+            if (!loggedIn) {
+                // Si no está logueado, redirigir a login y evitar el cambio de indicador.
+                if (event.target.closest('a').href.endsWith('/auth/login')) {
+                    // Si el enlace ya apunta a login, simplemente se ignora y se permite la navegación
+                    return; 
+                }
+                // Si intenta ir a una ruta protegida, se redirige.
+                window.location.href = '{{ url_for("auth.login") }}';
+                event.preventDefault();
+            }
+        }
+
+
+        // -------------------------------------------
+        // Lógica de Temas
+        // -------------------------------------------
         const themes = ['theme-dark', 'theme-light', 'theme-sepia'];
         let currentThemeIndex = 0;
+        
+        function getPathname() {
+            // Retorna la ruta base (ej: /auth/login, /index) sin el origen
+            return window.location.pathname.replace(/^\/|\/$/g, '');
+        }
 
         // Función para cambiar el tema
         function toggleTheme() {
-            // Elimina la clase actual
             body.classList.remove(themes[currentThemeIndex]);
-            
-            // Avanza al siguiente tema en el ciclo
             currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            
-            // Aplica la nueva clase
             const newTheme = themes[currentThemeIndex];
             body.classList.add(newTheme);
 
-            // Rotación visual del ícono (estético)
             const iconElement = themeToggleButton.querySelector('ion-icon');
-            iconElement.style.transform = `rotate(${currentThemeIndex * 120}deg)`; // Rota 120 grados por cada cambio
+            iconElement.style.transform = `rotate(${currentThemeIndex * 120}deg)`; 
 
-            // Actualiza la posición del indicador (necesario porque el color de fondo del body cambia)
             const activeItem = document.querySelector('.list.active');
             if (activeItem) {
-                // Pequeño retraso para asegurar que las variables CSS se actualicen
                 setTimeout(() => moveIndicator(activeItem), 50); 
             }
         }
         
-        // Asigna el evento al botón de temas
         themeToggleButton.addEventListener('click', toggleTheme);
+        body.classList.add('theme-dark'); // Tema inicial
 
-        // Inicializa el tema por defecto y asegura que el ícono tenga su estado inicial
-        body.classList.add('theme-dark');
-
+        // -------------------------------------------
+        // Lógica de Navbar y Movimiento
+        // -------------------------------------------
 
         // Función para inyectar y centrar el ícono dentro del indicador
         function updateIndicatorContent(element) {
             const iconName = element.getAttribute('data-icon-name');
-            // Creamos el HTML del ícono con su clase
             const iconHtml = `<span class="dot-icon"><ion-icon name="${iconName}"></ion-icon></span>`;
             
-            // Inyectamos el ícono en el indicador
             indicator.innerHTML = iconHtml;
             
-            // Obtenemos la referencia al ícono recién creado
             const dotIcon = indicator.querySelector('.dot-icon');
-
-            // Retraso para un fade más gradual.
             setTimeout(() => {
                 if (dotIcon) {
                     dotIcon.style.opacity = '1';
@@ -403,56 +573,83 @@
 
         // Función para mover el indicador
         function moveIndicator(element) {
+            // Calcular offset
             const listWidth = element.offsetWidth;
             const indicatorWidth = indicator.offsetWidth;
             const offset = element.offsetLeft + (listWidth / 2) - (indicatorWidth / 2);
 
-            // Antes de mover, aseguramos que el ícono anterior se oculte inmediatamente
+            // Ocultar ícono anterior
             const currentDotIcon = indicator.querySelector('.dot-icon');
             if (currentDotIcon) {
                 currentDotIcon.style.opacity = '0';
             }
 
-            // Aplica la transformación
-            indicator.style.transition = '0.5s'; // Mantiene la velocidad de movimiento del círculo
+            // Aplicar la transformación
+            indicator.style.transition = '0.5s';
             indicator.style.transform = `translateX(${offset}px)`;
             
             // Actualiza el contenido del indicador
             updateIndicatorContent(element);
         }
 
-        // Función para establecer el enlace activo
-        function activeLink(e) {
-            e.preventDefault(); 
-            
+        // Función para marcar el enlace activo basado en la URL
+        function highlightActiveLink() {
+            const path = getPathname();
+            let activeItem = null;
+
+            // Limpiar la clase 'active' de todos
             list.forEach((item) => {
                 item.classList.remove('active');
             });
             
-            this.classList.add('active');
+            // Identificar qué elemento debe estar activo
+            if (path.includes('index') || path === '') {
+                // Si es inicio o la raíz, activa el Home
+                activeItem = document.querySelector('[data-icon-name="home-outline"]').closest('li');
+            } else if (path.includes('login') || path.includes('register')) {
+                // Si es login o register, activa el Perfil/Acceder
+                activeItem = document.querySelector('[data-icon-name="person-outline"]').closest('li');
+            } else {
+                 // Si es cualquier otra cosa (mensajes, fotos, etc.), por defecto Home
+                 activeItem = document.querySelector('[data-icon-name="home-outline"]').closest('li');
+            }
 
-            moveIndicator(this);
-        }
-
-        // 1. Inicialización: Mueve el indicador a la posición del elemento 'active' por defecto (Home)
-        window.addEventListener('load', () => {
-            const activeItem = document.querySelector('.list.active');
             if (activeItem) {
+                activeItem.classList.add('active');
+                // Inicializa el indicador en la posición correcta
                 moveIndicator(activeItem);
             }
-        });
+        }
 
-        // 2. Asigna el evento de click a cada elemento 'list'
+        // Asignar el evento de click (solo para actualizar el indicador en SPA-like)
         list.forEach((item) => {
-            item.addEventListener('click', activeLink);
+            // Usamos un listener que solo actualiza el estado activo y mueve el indicador
+            item.addEventListener('click', (e) => {
+                 // Permitimos la navegación nativa (no hacemos e.preventDefault())
+                 // Solo actualizamos la clase activa y la posición del indicador inmediatamente
+                 
+                 list.forEach((i) => i.classList.remove('active'));
+                 item.classList.add('active');
+                 moveIndicator(item);
+            });
         });
         
-        // 3. Responsividad: Mueve el indicador si se cambia el tamaño de la ventana
+        // Inicialización y Responsividad
+        window.addEventListener('load', highlightActiveLink);
         window.addEventListener('resize', () => {
              const activeItem = document.querySelector('.list.active');
              if (activeItem) {
                 moveIndicator(activeItem);
              }
+        });
+        
+        // Ocultar mensajes flash después de 5 segundos
+        $(document).ready(function() {
+            window.setTimeout(function() {
+                $(".flash-message").fadeTo(500, 0).slideUp(500, function(){
+                    $(this).remove(); 
+                });
+            }, 5000); // 5 segundos
         });
 
     </script>
