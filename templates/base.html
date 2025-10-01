@@ -78,7 +78,7 @@
             display: flex;
             justify-content: center; /* Centrado Horizontal */
             align-items: center; /* Centrado Vertical */
-            min-height: 100vh;
+            /*min-height: 100vh;*/
             background: var(--clr-bg);
             /* AÑADIDO: Transición suave para el fondo del body */
             transition: background 0.3s ease-in-out; 
@@ -115,16 +115,30 @@
         .flash-warning { background-color: #ff9800; color: white; }
         .flash-info { background-color: #2196F3; color: white; }
 
+        /* Estilo para el logo en la esquina superior izquierda */
+        .app-logo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 70px; /* Tamaño solicitado */
+            height: 70px; /* Tamaño solicitado */
+            object-fit: contain; /* Asegura que la imagen se vea bien dentro de las dimensiones */
+            z-index: 1001; /* Alto, pero por debajo de los mensajes flash (1002) */
+            padding: 10px; /* Pequeño padding para no pegar al borde */
+            pointer-events: none; /* No debe interferir con los clics */
+        }
+
 
         /* Botón de cambio de tema y usuario */
         .nav-header-info {
             position: fixed;
             top: 0; /* Lo subimos a 0 para que ocupe todo el espacio superior */
             right: 0; /* Aseguramos la posición a la derecha */
-            width: 100%; /* Ocupa el ancho completo para evitar problemas de capas */
+            /* Se ajusta el ancho a 'auto' para que respete el espacio del logo en la izquierda */
+            width: auto; 
             height: 50px; /* Le damos una altura definida */
             
-            /* CORRECCIÓN Z-INDEX: Máximo para evitar superposición por mensajes flash (z-index: 1002) o contenido */
+             /* CORRECCIÓN Z-INDEX: Máximo para evitar superposición por mensajes flash (z-index: 1002) o contenido */
             z-index: 9999; 
             
             display: flex;
@@ -350,6 +364,17 @@
             /* Se añade margen superior e inferior fijo para evitar solapamiento con la barra superior y la navegación */
             padding-top: 65px; /* Para el header info */
             padding-bottom: calc(var(--nav-height) + 20px); 
+
+            /* --- CAMBIO CLAVE PARA OCULTAR EL SCROLLBAR DEL CONTENEDOR PRINCIPAL --- */
+            /* Ocultar scrollbar de Webkit (Chrome, Safari) */
+            &::-webkit-scrollbar {
+                display: none;
+            }
+            /* Ocultar scrollbar de IE and Edge */
+            -ms-overflow-style: none;  
+            /* Ocultar scrollbar de Firefox */
+            scrollbar-width: none;
+            /* ----------------------------------------------------------------------- */
         }
         
         /* Estado inicial al cargar la página */
@@ -368,15 +393,46 @@
         
         /* Estilos para formularios de Login/Registro */
         .auth-card {
-            background: var(--clr-card-bg); /* Usando la nueva variable de tema */
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background: none; /* ELIMINADO: Fondo para eliminar el efecto "card" */
+            padding: 0; /* ELIMINADO: Padding para que se extienda completamente */
+            border-radius: 0; /* ELIMINADO: Borde redondeado */
+            box-shadow: none; /* ELIMINADO: Sombra */
+            
             width: 100%;
             max-width: 380px;
-            /* ELIMINADO: margin-top: 50px; (El centrado vertical lo maneja el body) */
             margin: 0 auto; /* Asegura el centrado horizontal dentro de .content */
         }
+        
+        /* Ajustamos el padding de los inputs para mantener el espaciado visual */
+        .auth-card .input-group {
+             margin-bottom: 25px;
+             /* Aseguramos que los inputs tomen el espacio del card anterior */
+             padding: 0 10px; 
+        }
+        
+        .auth-card p {
+            /* Mantenemos el padding inferior para el texto */
+             padding: 0 10px; 
+        }
+        
+        /* APLICAR ALINEACIÓN CENTRAL Y ESPACIADO DEL CONTENIDO DEL FORMULARIO */
+        .auth-card form {
+             background: var(--clr-card-bg); /* Mantenemos el fondo del tema para que el formulario se vea en modo oscuro/claro */
+             padding: 30px; 
+             border-radius: 15px; 
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Una sombra muy ligera para destacarlo del fondo */
+        }
+        
+        /* SOBREESCRIBIR el estilo del grupo de inputs para que no tengan padding extra */
+        .auth-card form .input-group {
+             padding: 0;
+        }
+        
+        .auth-card h1 {
+            /* Estilo para el título fuera del card/form */
+            margin-bottom: 30px !important;
+        }
+
 
         .input-group {
             position: relative;
@@ -457,6 +513,9 @@
 <!-- El tema se establece dinámicamente en el script de abajo -->
 <body class="theme-dark"> 
     
+    <!-- NUEVA ESTRUCTURA: LOGO SUPERIOR IZQUIERDA (150px x 150px) -->
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="App Logo" class="app-logo">
+
     <!-- Contenedor para mensajes flash -->
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
