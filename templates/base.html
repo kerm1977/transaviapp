@@ -41,6 +41,7 @@
             --clr-nav-bg: #fff; 
             --clr-text-content: #ffffff; 
             --clr-icon-inactive: var(--clr-bg-default); /* Por defecto, los íconos inactivos toman el color de fondo del body */
+            --clr-card-bg: var(--clr-nav-bg); /* Variable agregada para consistencia */
         }
 
         .theme-light {
@@ -48,6 +49,7 @@
             --clr-nav-bg: #ffffff;
             --clr-text-content: #222327;
             --clr-icon-inactive: #888; 
+            --clr-card-bg: #ffffff;
         }
 
         .theme-sepia {
@@ -55,6 +57,7 @@
             --clr-nav-bg: #f9f0e2;
             --clr-text-content: #5c4033;
             --clr-icon-inactive: #5c4033;
+            --clr-card-bg: #f9f0e2;
         }
 
         .theme-dark {
@@ -63,6 +66,7 @@
             --clr-text-content: #ffffff;
             /* CAMBIO: Íconos inactivos toman el color Warning */
             --clr-icon-inactive: var(--clr-warning); 
+            --clr-card-bg: #2d2d2d;
         }
         /* ------------------------------------------- */
         /* FIN TEMAS */
@@ -76,8 +80,8 @@
             align-items: center; /* Centrado Vertical */
             min-height: 100vh;
             background: var(--clr-bg);
-            /* ELIMINADO: padding-bottom: var(--nav-height); Ya no es necesario aquí */
-            transition: background 0.3s; 
+            /* AÑADIDO: Transición suave para el fondo del body */
+            transition: background 0.3s ease-in-out; 
             
             /* AHORA EL BODY ES LA CAJA FLEXIBLE COMPLETA */
             width: 100vw;
@@ -307,7 +311,8 @@
             width: 100%;
             max-width: 450px;
             margin: 0 auto;
-            transition: color 0.3s;
+            /* AÑADIDO: Transición de opacidad para el fade-in/out */
+            transition: opacity 0.2s ease-in-out, color 0.3s;
             
             /* NUEVOS ESTILOS PARA GESTIONAR EL ESPACIO */
             /* Se establece el tamaño máximo del área disponible (Viewport - Navbar) */
@@ -319,13 +324,24 @@
             padding-top: 65px; /* Para el header info */
             padding-bottom: calc(var(--nav-height) + 20px); 
         }
+        
+        /* Estado inicial al cargar la página */
+        .content.page-loading {
+            opacity: 0;
+        }
+
+        /* Estado final después de que la página termina de cargar (se activa en JS) */
+        .content.page-loaded {
+            opacity: 1;
+        }
+        
         .content h1 {
             margin-bottom: 20px;
         }
         
         /* Estilos para formularios de Login/Registro */
         .auth-card {
-            background: var(--clr-nav-bg);
+            background: var(--clr-card-bg); /* Usando la nueva variable de tema */
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
@@ -354,6 +370,7 @@
             padding: 12px 40px 12px 15px; /* Más padding a la derecha para el ícono */
             border: 1px solid #ccc;
             border-radius: 8px;
+            /* CAMBIO: Usamos var(--clr-bg) para el fondo del input y var(--clr-text-content) para el color de la letra */
             background: var(--clr-bg);
             color: var(--clr-text-content);
             transition: border-color 0.3s;
@@ -407,14 +424,10 @@
         .alert-info { background-color: #d1ecf1; color: #0c5460; }
         .alert-warning { background-color: #fff3cd; color: #856404; }
         
-        /* Corrección de altura para evitar que el contenido desaparezca al centrar */
-        /* Hacemos que .content se ajuste automáticamente a su contenido si es pequeño */
-        /* Y que el body se encargue del centrado */
-
     </style>
 </head>
 
-<!-- El tema se establece dinámicamente -->
+<!-- El tema se establece dinámicamente en el script de abajo -->
 <body class="theme-dark"> 
     
     <!-- Contenedor para mensajes flash -->
@@ -449,7 +462,19 @@
 
     <!-- Contenido de la vista (Index, Login, Register, etc.) -->
     <!-- El body centra vertical y horizontalmente este div -->
-    <div class="content">
+    <!-- Clase page-loading por defecto para aplicar fade-in al cargar -->
+    <div class="content page-loading" id="main-content">
+        <!-- Mostramos el título de la página si se pasó como argumento (para las nuevas rutas) -->
+        {% if page_title and page_title != "Inicio" %}
+            <h1 style="font-size: 2.5em; margin-bottom: 20px; color: var(--clr-main);">
+                <ion-icon name="{{ 'chatbubble-outline' if page_title == 'Mensajes' else ('camera-outline' if page_title == 'Fotos' else 'settings-outline') }}" style="vertical-align: middle;"></ion-icon>
+                {{ page_title }}
+            </h1>
+            <p style="font-size: 1.1em; margin-bottom: 30px; color: var(--clr-text-content);">
+                Contenido de la sección de {{ page_title | lower }}.
+            </p>
+        {% endif %}
+        
         {% block content %}{% endblock %}
     </div>
 
@@ -460,7 +485,7 @@
     <div class="navigation">
         <ul>
             <!-- Elementos de la lista -->
-            <li class="list active" data-icon-name="home-outline">
+            <li class="list active" data-icon-name="home-outline" data-path="index">
                 <a href="{{ url_for('main.index') }}">
                     <span class="icon">
                         <ion-icon name="home-outline"></ion-icon>
@@ -470,7 +495,8 @@
             </li>
             
             <!-- ENLACE DINÁMICO DE PERFIL/LOGIN -->
-            <li class="list" data-icon-name="person-outline">
+            <li class="list" data-icon-name="person-outline" data-path="auth">
+                <!-- Único enlace que mantiene la lógica condicional -->
                 <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}">
                     <span class="icon">
                         <ion-icon name="person-outline"></ion-icon>
@@ -481,25 +507,29 @@
                 </a>
             </li>
             
-            <!-- Estos enlaces solo funcionan si se está logueado -->
-            <li class="list" data-icon-name="chatbubble-outline">
-                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
+            <!-- ENLACE A MENSAJES (Ruta directa) -->
+            <li class="list" data-icon-name="chatbubble-outline" data-path="messages">
+                <a href="{{ url_for('main.messages') }}">
                     <span class="icon">
                         <ion-icon name="chatbubble-outline"></ion-icon>
                     </span>
                     <span class="text">Mensajes</span>
                 </a>
             </li>
-            <li class="list" data-icon-name="camera-outline">
-                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
+            
+            <!-- ENLACE A FOTOS (Ruta directa) -->
+            <li class="list" data-icon-name="camera-outline" data-path="photos">
+                <a href="{{ url_for('main.photos') }}">
                     <span class="icon">
                         <ion-icon name="camera-outline"></ion-icon>
                     </span>
                     <span class="text">Fotos</span>
                 </a>
             </li>
-            <li class="list" data-icon-name="settings-outline">
-                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}" onclick="handleNavClick(event)">
+            
+            <!-- ENLACE A AJUSTES (Ruta directa) -->
+            <li class="list" data-icon-name="settings-outline" data-path="settings">
+                <a href="{{ url_for('main.settings') }}">
                     <span class="icon">
                         <ion-icon name="settings-outline"></ion-icon>
                     </span>
@@ -524,58 +554,84 @@
         const indicator = document.querySelector('.indicator');
         const body = document.body;
         const themeToggleButton = document.getElementById('theme-toggle');
+        const mainContent = document.getElementById('main-content'); // Nuevo: Referencia al div de contenido
 
-        // Función para manejar el clic en enlaces protegidos (si no está logueado)
-        function handleNavClick(event) {
-            const loggedIn = "{{ session.logged_in | default('False') }}" === 'True';
-            if (!loggedIn) {
-                // Si no está logueado, redirigir a login y evitar el cambio de indicador.
-                if (event.target.closest('a').href.endsWith('/auth/login')) {
-                    // Si el enlace ya apunta a login, simplemente se ignora y se permite la navegación
-                    return; 
+        // ===========================================
+        // FUNCIONES GLOBALES REQUERIDAS
+        // ===========================================
+
+        function getPathname() {
+            // Retorna la ruta base (ej: /auth/login, /messages) sin el origen
+            const path = window.location.pathname.replace(/^\/|\/$/g, '');
+            
+            if (path.startsWith('auth/')) {
+                 return 'auth';
+            }
+            return path;
+        }
+
+        // -------------------------------------------
+        // Lógica de Temas con Persistencia (localStorage)
+        // -------------------------------------------
+        const themes = ['theme-dark', 'theme-light', 'theme-sepia'];
+        const localStorageKey = 'appTheme'; // Clave para guardar en localStorage
+
+        function getCurrentThemeIndex() {
+            for (let i = 0; i < themes.length; i++) {
+                if (body.classList.contains(themes[i])) {
+                    return i;
                 }
-                // Si intenta ir a una ruta protegida, se redirige.
-                window.location.href = '{{ url_for("auth.login") }}';
-                event.preventDefault();
+            }
+            return 0; // Por defecto 'theme-dark'
+        }
+        
+        function applyTheme(themeClass, initialLoad = false) {
+            themes.forEach(t => body.classList.remove(t));
+            body.classList.add(themeClass);
+            
+            if (!initialLoad) {
+                 const newIndex = getCurrentThemeIndex();
+                 const iconElement = themeToggleButton.querySelector('ion-icon');
+                 iconElement.style.transform = `rotate(${newIndex * 120}deg)`; 
+                 localStorage.setItem(localStorageKey, themeClass);
             }
         }
 
-
-        // -------------------------------------------
-        // Lógica de Temas
-        // -------------------------------------------
-        const themes = ['theme-dark', 'theme-light', 'theme-sepia'];
-        let currentThemeIndex = 0;
-        
-        function getPathname() {
-            // Retorna la ruta base (ej: /auth/login, /index) sin el origen
-            return window.location.pathname.replace(/^\/|\/$/g, '');
-        }
-
-        // Función para cambiar el tema
         function toggleTheme() {
-            body.classList.remove(themes[currentThemeIndex]);
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            const newTheme = themes[currentThemeIndex];
-            body.classList.add(newTheme);
-
-            const iconElement = themeToggleButton.querySelector('ion-icon');
-            iconElement.style.transform = `rotate(${currentThemeIndex * 120}deg)`; 
-
+            const currentThemeIndex = getCurrentThemeIndex();
+            let newThemeIndex = (currentThemeIndex + 1) % themes.length;
+            const newTheme = themes[newThemeIndex];
+            
+            applyTheme(newTheme, false); 
+            
             const activeItem = document.querySelector('.list.active');
             if (activeItem) {
                 setTimeout(() => moveIndicator(activeItem), 50); 
             }
         }
         
+        function loadInitialTheme() {
+            const savedTheme = localStorage.getItem(localStorageKey);
+            if (savedTheme && themes.includes(savedTheme)) {
+                applyTheme(savedTheme, true); 
+            } else {
+                applyTheme('theme-dark', true); 
+            }
+            
+            const initialIndex = getCurrentThemeIndex();
+            const iconElement = themeToggleButton.querySelector('ion-icon');
+            iconElement.style.transform = `rotate(${initialIndex * 120}deg)`; 
+        }
+
+        loadInitialTheme();
+        
         themeToggleButton.addEventListener('click', toggleTheme);
-        body.classList.add('theme-dark'); // Tema inicial
+
 
         // -------------------------------------------
         // Lógica de Navbar y Movimiento
         // -------------------------------------------
 
-        // Función para inyectar y centrar el ícono dentro del indicador
         function updateIndicatorContent(element) {
             const iconName = element.getAttribute('data-icon-name');
             const iconHtml = `<span class="dot-icon"><ion-icon name="${iconName}"></ion-icon></span>`;
@@ -590,71 +646,90 @@
             }, 500); 
         }
 
-        // Función para mover el indicador
         function moveIndicator(element) {
-            // Calcular offset
             const listWidth = element.offsetWidth;
             const indicatorWidth = indicator.offsetWidth;
             const offset = element.offsetLeft + (listWidth / 2) - (indicatorWidth / 2);
 
-            // Ocultar ícono anterior
             const currentDotIcon = indicator.querySelector('.dot-icon');
             if (currentDotIcon) {
                 currentDotIcon.style.opacity = '0';
             }
 
-            // Aplicar la transformación
             indicator.style.transition = '0.5s';
             indicator.style.transform = `translateX(${offset}px)`;
             
-            // Actualiza el contenido del indicador
             updateIndicatorContent(element);
         }
 
-        // Función para marcar el enlace activo basado en la URL
         function highlightActiveLink() {
-            const path = getPathname();
+            const path = getPathname(); 
             let activeItem = null;
-
-            // Limpiar la clase 'active' de todos
+            
             list.forEach((item) => {
                 item.classList.remove('active');
             });
             
-            // Identificar qué elemento debe estar activo
-            if (path.includes('index') || path === '') {
-                // Si es inicio o la raíz, activa el Home
-                activeItem = document.querySelector('[data-icon-name="home-outline"]').closest('li');
-            } else if (path.includes('login') || path.includes('register')) {
-                // Si es login o register, activa el Perfil/Acceder
-                activeItem = document.querySelector('[data-icon-name="person-outline"]').closest('li');
-            } else {
-                 // Si es cualquier otra cosa (mensajes, fotos, etc.), por defecto Home
-                 activeItem = document.querySelector('[data-icon-name="home-outline"]').closest('li');
+            activeItem = document.querySelector(`[data-path="${path}"]`);
+
+            if (!activeItem && (path === '' || path === 'main' || path.includes('index'))) {
+                activeItem = document.querySelector('[data-path="index"]');
             }
+            
+            if (!activeItem) {
+                activeItem = document.querySelector('[data-path="index"]');
+            }
+
 
             if (activeItem) {
                 activeItem.classList.add('active');
-                // Inicializa el indicador en la posición correcta
                 moveIndicator(activeItem);
             }
         }
 
-        // Asignar el evento de click (solo para actualizar el indicador en SPA-like)
+        // --- FUNCIÓN DE NAVEGACIÓN SUAVIZADA ---
+        function smoothNavigate(e) {
+            // Previene la navegación inmediata del enlace
+            e.preventDefault();
+            
+            const listItem = e.currentTarget.closest('.list');
+            const targetUrl = e.currentTarget.href;
+
+            // 1. Oculta el contenido antes de la recarga
+            mainContent.style.opacity = '0'; 
+
+            // 2. Mueve el indicador inmediatamente
+            list.forEach((i) => i.classList.remove('active'));
+            listItem.classList.add('active');
+            moveIndicator(listItem);
+
+            // 3. Espera a que la animación CSS del indicador termine (0.5s + 50ms buffer)
+            setTimeout(() => {
+                // 4. Navega a la nueva URL (esto recarga toda la página)
+                window.location.href = targetUrl;
+            }, 550); 
+        }
+
+        // Reasignar el evento de click para usar la función smoothNavigate
         list.forEach((item) => {
-            // Usamos un listener que solo actualiza el estado activo y mueve el indicador
-            item.addEventListener('click', (e) => {
-                 // Permitimos la navegación nativa (no hacemos e.preventDefault())
-                 // Solo actualizamos la clase activa y la posición del indicador inmediatamente
+            const link = item.querySelector('a');
+            if (link) {
+                 // Eliminamos cualquier listener anterior (para limpiar el estado)
+                 link.removeEventListener('click', smoothNavigate);
                  
-                 list.forEach((i) => i.classList.remove('active'));
-                 item.classList.add('active');
-                 moveIndicator(item);
-            });
+                 // Añadimos el nuevo smoothNavigate
+                 link.addEventListener('click', smoothNavigate);
+            }
         });
         
         // Inicialización y Responsividad
-        window.addEventListener('load', highlightActiveLink);
+        window.addEventListener('load', () => {
+             highlightActiveLink();
+             // Añadido: Hace visible el contenido después de que el indicador se ha movido
+             mainContent.classList.remove('page-loading');
+             mainContent.classList.add('page-loaded');
+        });
+        
         window.addEventListener('resize', () => {
              const activeItem = document.querySelector('.list.active');
              if (activeItem) {

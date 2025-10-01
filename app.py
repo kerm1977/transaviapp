@@ -159,11 +159,30 @@ def logout():
 # =======================================================
 main_bp = Blueprint('main', __name__, template_folder='templates')
 
-@main_bp.route('/index') # Cambiada la ruta para ser explícita
-@is_logged_in
+@main_bp.route('/index') 
+# @is_logged_in <--- ELIMINADO: Ahora es accesible públicamente
 def index():
-    """Ruta principal (requiere autenticación)."""
+    """Ruta principal (Pública)."""
     return render_template('index.html')
+
+# NUEVAS RUTAS DE NAVEGACIÓN (Públicas)
+@main_bp.route('/messages')
+# @is_logged_in <--- ELIMINADO
+def messages():
+    """Vista de Mensajes (Pública)."""
+    return render_template('index.html', page_title="Mensajes")
+
+@main_bp.route('/photos')
+# @is_logged_in <--- ELIMINADO
+def photos():
+    """Vista de Fotos (Pública)."""
+    return render_template('index.html', page_title="Fotos")
+
+@main_bp.route('/settings')
+# @is_logged_in <--- ELIMINADO
+def settings():
+    """Vista de Ajustes (Pública)."""
+    return render_template('index.html', page_title="Ajustes")
 
 # =======================================================
 # REGISTRO DE BLUEPRINTS Y RUTAS GLOBALES
@@ -178,8 +197,8 @@ def home():
     if 'logged_in' in session and session['logged_in']:
         return redirect(url_for('main.index'))
     else:
-        return redirect(url_for('auth.login'))
-
+        # CAMBIADO: Redirigir a Index (página pública) en lugar de login si la app es pública
+        return redirect(url_for('main.index'))
 
 
 # PROHIBIDO TOCAR ESTA ÁREA NI LOS COMENTARIOS 
