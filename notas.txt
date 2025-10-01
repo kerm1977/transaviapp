@@ -1,0 +1,26 @@
+Hola necesito crear una aplicación en flask que se conecte a una base de datos sqlite
+Esta base de datos debe llamarse db.db
+esta debe estar al mismo nivel de app.py
+
+app.py va a contener absolutamente toda la lógica de la aplicación y utilizar blueprints
+
+
+todas las vistas van a heredear de base.html
+
+al ejecutar la app tiene que dirigirse automáticamente a index.html que hereda de base.html
+
+vas a crear un login.html que permita loguarse con email y contraseña. Contraseña debe tener un ojo para verla
+tambien un botón de recordar contraseña un enlace que lleve a register.html y otro que mantenga la sesión activa
+si al loguearse todo es correcto se dirige a index.html
+Si el usuario se registra, debe aparecer el nombre arriba a la par de botón del tema
+
+vas a crear un register.html que permita registrar usuarios con el Nombre, Primer Apellido, Segundo Apellido, Teléfono, Email, Usuario, (Contraseña, Verificar contraseña) estos dos últimos con ojo para ver las contraseñas y un enlace que diga, ya tengo una cuenta.
+en esta misma vista van a validarse de la siguiente forma
+Nombre (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
+Primer Apellido (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
+Segundo Apellido (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
+Teléfono (No va a permitir escribir letras ni caracteres especiales ni de puntación, solo puede contener 8 caracteres y no menos de 8 caracteres)
+Usuario (No va a permitir escribir más de 10 caracteres, y aparece una validación indicando si el usuario es valido o no)
+
+
+TODO LO RELACIONADO A LOS USUARIO REGISTRADOS CONECCION DE LA BASE DE DATOS VA A ESTAR DENTRO DE config.py

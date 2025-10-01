@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APP</title>
+
+    <!-- Importar ionicons para los iconos -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <!-- ======================================================= -->
+    <!-- ESTILOS CSS INLINE (Responsivo y Fijo en el Pie) -->
+    <!-- ======================================================= -->
+
+    <!-- PROHIBIDO TOCAR LOS TEMAS DEL NAVBAR -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif; /* Usando Inter para estética */
+        }
+
+        /* ------------------------------------------- */
+        /* TEMAS (Variables Globales) */
+        /* ------------------------------------------- */
+        :root {
+            /* Colores Base */
+            --clr-main: #ff9900; /* Naranja vibrante (activo) */
+            --clr-warning: #ffb700; /* Ámbar/Warning */
+            --clr-bg-default: #222327;
+            --nav-height: 70px;
+            
+            /* Tema por defecto (Dark original) */
+            --clr-bg: var(--clr-bg-default); 
+            --clr-nav-bg: #fff; 
+            --clr-text-content: #ffffff; 
+            --clr-icon-inactive: var(--clr-bg-default); /* Por defecto, los íconos inactivos toman el color de fondo del body */
+        }
+
+        .theme-light {
+            --clr-bg: #f5f5f5;
+            --clr-nav-bg: #ffffff;
+            --clr-text-content: #222327;
+            --clr-icon-inactive: #888; 
+        }
+
+        .theme-sepia {
+            --clr-bg: #f8e5c8;
+            --clr-nav-bg: #f9f0e2;
+            --clr-text-content: #5c4033;
+            --clr-icon-inactive: #5c4033;
+        }
+
+        .theme-dark {
+            --clr-bg: #121212;
+            --clr-nav-bg: #2d2d2d;
+            --clr-text-content: #ffffff;
+            /* CAMBIO: Íconos inactivos toman el color Warning */
+            --clr-icon-inactive: var(--clr-warning); 
+        }
+        /* ------------------------------------------- */
+        /* FIN TEMAS */
+        /* ------------------------------------------- */
+
+      /*PROHIBIDO TOCAR LOS ESTILOS DEL NAVBAR*/
+        body {
+            /* Mantenemos el body en el centro para demostración, pero la navegación se fija */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: var(--clr-bg);
+            padding-bottom: var(--nav-height); /* Añade padding para que el contenido no se oculte detrás del navbar */
+            transition: background 0.3s; /* Suaviza el cambio de fondo del body */
+        }
+
+        /* Botón de cambio de tema */
+        #theme-toggle {
+            /* Posicionamiento y Estilo */
+            position: fixed;
+            top: 15px; /* Más cerca de la esquina */
+            right: 15px; /* Más cerca de la esquina */
+            background: none;
+            border: none;
+            color: var(--clr-text-content); /* Color del ícono basado en el tema */
+            cursor: pointer;
+            z-index: 1001;
+            padding: 10px;
+            font-size: 1.8em; /* Tamaño del ícono */
+            line-height: 1;
+            transition: color 0.3s, transform 0.2s;
+        }
+        #theme-toggle:hover {
+            transform: scale(1.1); /* Efecto hover */
+        }
+        /* Rotación del ícono de engranaje para hacerlo interactivo */
+        #theme-toggle ion-icon {
+            transition: transform 0.8s ease-in-out;
+        }
+
+
+        /* Contenedor principal de la navegación: Fijo y 100% de ancho */
+        .navigation {
+            position: fixed; /* Lo fija en la pantalla */
+            bottom: 0; /* Lo coloca en el pie de la página */
+            
+            /* CENTRADO PERFECTO: */
+            left: 50%; /* Mueve el punto de inicio al 50% de la izquierda del viewport */
+            transform: translateX(-50%); /* Desplaza el elemento hacia la izquierda el 50% de su propio ancho */
+            /* Fin Centrado */
+            
+            width: 100%; /* Ocupa todo el ancho de la pantalla */
+            max-width: 450px; /* Limita el ancho en pantallas grandes (desktop) */
+            height: var(--nav-height);
+            background: var(--clr-nav-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0; 
+            border-top-left-radius: 15px; 
+            border-top-right-radius: 15px;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000; /* Asegura que esté por encima del contenido */
+            transition: background 0.3s; /* Suaviza el cambio de fondo de la barra */
+        }
+
+        .navigation ul {
+            display: flex;
+            width: 100%; 
+            padding: 0 10px;
+        }
+
+        .navigation ul li {
+            position: relative;
+            list-style: none;
+            width: 20%; 
+            flex-grow: 1;
+            height: var(--nav-height);
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navigation ul li a {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            width: 100%;
+            text-align: center;
+            font-weight: 500;
+            text-decoration: none;
+            height: 100%; /* Asegura que el enlace ocupe todo el LI */
+        }
+
+        .navigation ul li a .icon {
+            position: relative;
+            display: block;
+            font-size: 1.5em;
+            text-align: center;
+            transition: 0.5s;
+            /* CAMBIO: Íconos inactivos usan la variable de color dinámica */
+            color: var(--clr-icon-inactive); 
+            padding-top: 18px; 
+            pointer-events: none; 
+        }
+
+        /* Transformación del ícono original (hacia arriba) */
+        .navigation ul li.active a .icon {
+            transform: translateY(-32px);
+            /* Ocultamos completamente el ícono original */
+            opacity: 0;
+            padding-top: 0; 
+        }
+
+        .navigation ul li a .text {
+            position: absolute;
+            color: var(--clr-main);
+            font-weight: 600;
+            font-size: 0.75em;
+            letter-spacing: 0.05em;
+            transition: 0.5s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        /* Mostrar texto con color naranja cuando está activo */
+        .navigation ul li.active a .text {
+            opacity: 1;
+            transform: translateY(10px);
+        }
+
+        /* --- Indicador de la Magia (Color Naranja) --- */
+        .indicator {
+            position: absolute;
+            top: -50%;
+            width: 60px; 
+            height: 60px;
+            background: var(--clr-main);
+            border-radius: 50%;
+            border: 6px solid var(--clr-bg); /* Borde toma el color del fondo principal */
+            transition: 0.5s;
+            transform: translateX(0); /* Inicialmente centrado por JS */
+            
+            /* Configuración para centrar el ícono inyectado */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden; 
+        }
+        
+        /* Ícono inyectado que vive dentro del indicador */
+        .indicator .dot-icon {
+            color: #000; /* Ícono negro dentro del círculo naranja */
+            font-size: 1.5em;
+            /* Transición más lenta para un fade suave */
+            opacity: 1; 
+            transition: opacity 1.0s ease-in-out; 
+            line-height: 1; 
+        }
+        
+
+        /* Efecto de curva a la izquierda (corte) */
+        .indicator::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: -22px;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border-top-right-radius: 20px;
+            box-shadow: 1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
+        }
+
+        /* Efecto de curva a la derecha (corte) */
+        .indicator::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: -22px;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border-top-left-radius: 20px;
+            box-shadow: -1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
+        }
+        
+        /* Contenido de ejemplo para ver el efecto fijo */
+        .content {
+            padding: 20px;
+            color: var(--clr-text-content); /* El texto del contenido cambia según el tema */
+            text-align: center;
+            font-size: 1.2em;
+            transition: color 0.3s;
+        }
+        .content h1 {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body class="theme-dark"> 
+
+    <!-- Botón de cambio de tema: Ahora es un ícono de configuración -->
+    <!-- eSTE BOTÓN NO SE PUEDE MOVER DE AQUI NI MODIFICAR  ABSOLUTAMENTE NADA DE EL  -->
+    <button id="theme-toggle" title="Cambiar Tema">
+        <ion-icon name="color-palette-outline"></ion-icon>
+    </button>
+
+    <!-- Contenido de ejemplo (simula el cuerpo de la página) -->
+    <div class="content">
+        <h1>Bienvenido a la Web Móvil</h1>
+        <p>Esta es una simulación de contenido de aplicación móvil.</p>
+        <p>Usa el ícono de paleta de colores en la esquina para cambiar el tema.</p>
+        <p>Redimensiona la ventana del navegador para ver el efecto responsivo.</p>
+        <div style="height: 60vh;"></div> <!-- Espacio para simular scroll -->
+        <p>Fin del contenido.</p>
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- ESTRUCTURA HTML -->
+    <!-- ======================================================= -->
+    <div class="navigation">
+        <ul>
+            <!-- Elementos de la lista -->
+            <li class="list active" data-icon-name="home-outline">
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="home-outline"></ion-icon>
+                    </span>
+                    <span class="text">Inicio</span>
+                </a>
+            </li>
+            <li class="list" data-icon-name="person-outline">
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="person-outline"></ion-icon>
+                    </span>
+                    <span class="text">Perfil</span>
+                </a>
+            </li>
+            <li class="list" data-icon-name="chatbubble-outline">
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="chatbubble-outline"></ion-icon>
+                    </span>
+                    <span class="text">Mensajes</span>
+                </a>
+            </li>
+            <li class="list" data-icon-name="camera-outline">
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="camera-outline"></ion-icon>
+                    </span>
+                    <span class="text">Fotos</span>
+                </a>
+            </li>
+            <li class="list" data-icon-name="settings-outline">
+                <a href="#">
+                    <span class="icon">
+                        <ion-icon name="settings-outline"></ion-icon>
+                    </span>
+                    <span class="text">Ajustes</span>
+                </a>
+            </li>
+
+            <!-- INDICADOR: Ahora solo contendrá el ícono activo inyectado por JS -->
+            <div class="indicator">
+                <!-- Ícono de reemplazo. Se inyecta aquí con JS -->
+            </div>
+        </ul>
+    </div>
+
+    <!-- ======================================================= -->
+    <!-- COMPORTAMIENTO JAVASCRIPT (Responsivo, Centrado y Temas) -->
+    <!-- ======================================================= -->
+    <script>
+        const list = document.querySelectorAll('.list');
+        const indicator = document.querySelector('.indicator');
+        const body = document.body;
+        const themeToggleButton = document.getElementById('theme-toggle');
+
+        // Definición de los temas y sus nombres visibles
+        const themes = ['theme-dark', 'theme-light', 'theme-sepia'];
+        let currentThemeIndex = 0;
+
+        // Función para cambiar el tema
+        function toggleTheme() {
+            // Elimina la clase actual
+            body.classList.remove(themes[currentThemeIndex]);
+            
+            // Avanza al siguiente tema en el ciclo
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            
+            // Aplica la nueva clase
+            const newTheme = themes[currentThemeIndex];
+            body.classList.add(newTheme);
+
+            // Rotación visual del ícono (estético)
+            const iconElement = themeToggleButton.querySelector('ion-icon');
+            iconElement.style.transform = `rotate(${currentThemeIndex * 120}deg)`; // Rota 120 grados por cada cambio
+
+            // Actualiza la posición del indicador (necesario porque el color de fondo del body cambia)
+            const activeItem = document.querySelector('.list.active');
+            if (activeItem) {
+                // Pequeño retraso para asegurar que las variables CSS se actualicen
+                setTimeout(() => moveIndicator(activeItem), 50); 
+            }
+        }
+        
+        // Asigna el evento al botón de temas
+        themeToggleButton.addEventListener('click', toggleTheme);
+
+        // Inicializa el tema por defecto y asegura que el ícono tenga su estado inicial
+        body.classList.add('theme-dark');
+
+
+        // Función para inyectar y centrar el ícono dentro del indicador
+        function updateIndicatorContent(element) {
+            const iconName = element.getAttribute('data-icon-name');
+            // Creamos el HTML del ícono con su clase
+            const iconHtml = `<span class="dot-icon"><ion-icon name="${iconName}"></ion-icon></span>`;
+            
+            // Inyectamos el ícono en el indicador
+            indicator.innerHTML = iconHtml;
+            
+            // Obtenemos la referencia al ícono recién creado
+            const dotIcon = indicator.querySelector('.dot-icon');
+
+            // Retraso para un fade más gradual.
+            setTimeout(() => {
+                if (dotIcon) {
+                    dotIcon.style.opacity = '1';
+                }
+            }, 500); 
+        }
+
+        // Función para mover el indicador
+        function moveIndicator(element) {
+            const listWidth = element.offsetWidth;
+            const indicatorWidth = indicator.offsetWidth;
+            const offset = element.offsetLeft + (listWidth / 2) - (indicatorWidth / 2);
+
+            // Antes de mover, aseguramos que el ícono anterior se oculte inmediatamente
+            const currentDotIcon = indicator.querySelector('.dot-icon');
+            if (currentDotIcon) {
+                currentDotIcon.style.opacity = '0';
+            }
+
+            // Aplica la transformación
+            indicator.style.transition = '0.5s'; // Mantiene la velocidad de movimiento del círculo
+            indicator.style.transform = `translateX(${offset}px)`;
+            
+            // Actualiza el contenido del indicador
+            updateIndicatorContent(element);
+        }
+
+        // Función para establecer el enlace activo
+        function activeLink(e) {
+            e.preventDefault(); 
+            
+            list.forEach((item) => {
+                item.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+
+            moveIndicator(this);
+        }
+
+        // 1. Inicialización: Mueve el indicador a la posición del elemento 'active' por defecto (Home)
+        window.addEventListener('load', () => {
+            const activeItem = document.querySelector('.list.active');
+            if (activeItem) {
+                moveIndicator(activeItem);
+            }
+        });
+
+        // 2. Asigna el evento de click a cada elemento 'list'
+        list.forEach((item) => {
+            item.addEventListener('click', activeLink);
+        });
+        
+        // 3. Responsividad: Mueve el indicador si se cambia el tamaño de la ventana
+        window.addEventListener('resize', () => {
+             const activeItem = document.querySelector('.list.active');
+             if (activeItem) {
+                moveIndicator(activeItem);
+             }
+        });
+
+    </script>
+</body>
+</html>
