@@ -119,12 +119,25 @@
         /* Botón de cambio de tema y usuario */
         .nav-header-info {
             position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1001;
+            top: 0; /* Lo subimos a 0 para que ocupe todo el espacio superior */
+            right: 0; /* Aseguramos la posición a la derecha */
+            width: 100%; /* Ocupa el ancho completo para evitar problemas de capas */
+            height: 50px; /* Le damos una altura definida */
+            
+            /* CORRECCIÓN Z-INDEX: Máximo para evitar superposición por mensajes flash (z-index: 1002) o contenido */
+            z-index: 9999; 
+            
             display: flex;
             align-items: center;
+            justify-content: flex-end; /* Alinea los elementos a la derecha */
             gap: 15px;
+            padding-right: 15px; /* Mantiene el padding del borde derecho */
+            padding-left: 15px; /* Añadido para consistencia */
+            pointer-events: none; /* CORRECCIÓN CLAVE: Permite clicks a través del div, excepto en los hijos */
+        }
+        
+        .nav-header-info > * {
+             pointer-events: auto; /* Hace que los hijos (span, a, button) sean clicables */
         }
         
         .nav-header-info span {
@@ -139,17 +152,31 @@
             border: none;
             color: var(--clr-text-content); /* Color del ícono basado en el tema */
             cursor: pointer;
-            padding: 10px;
+            /* CORRECCIÓN #1: Quitamos el padding del padre y definimos un tamaño fijo para asegurar el área de clic. */
+            padding: 0; 
+            width: 38px;
+            height: 38px;
             font-size: 1.8em; /* Tamaño del ícono */
-            line-height: 1;
+            
+            /* Usamos Flexbox para centrar el ícono dentro del área fija. */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            
             transition: color 0.3s, transform 0.2s;
+            /* z-index explícito para el botón */
+            z-index: 10; 
         }
         #theme-toggle:hover {
             transform: scale(1.1); /* Efecto hover */
         }
         /* Rotación del ícono de engranaje para hacerlo interactivo */
         #theme-toggle ion-icon {
+            /* CORRECCIÓN #2: Ajustamos el line-height y la alineación del ícono Ionicon */
+            line-height: normal; 
+            vertical-align: middle;
             transition: transform 0.8s ease-in-out;
+            padding: 5px; /* Añadimos un pequeño padding al ícono para el "hitbox" táctil */
         }
 
 
