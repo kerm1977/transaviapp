@@ -70,14 +70,18 @@
 
       /*PROHIBIDO TOCAR LOS ESTILOS DEL NAVBAR*/
         body {
-            /* Mantenemos el body en el centro para demostración, pero la navegación se fija */
+            /* CAMBIOS APLICADOS AQUI PARA EL CENTRADO PERFECTO */
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: center; /* Centrado Horizontal */
+            align-items: center; /* Centrado Vertical */
             min-height: 100vh;
             background: var(--clr-bg);
-            padding-bottom: var(--nav-height); /* Añade padding para que el contenido no se oculte detrás del navbar */
-            transition: background 0.3s; /* Suaviza el cambio de fondo del body */
+            /* ELIMINADO: padding-bottom: var(--nav-height); Ya no es necesario aquí */
+            transition: background 0.3s; 
+            
+            /* AHORA EL BODY ES LA CAJA FLEXIBLE COMPLETA */
+            width: 100vw;
+            overflow-y: auto; /* Permite scroll si el contenido es más alto que la pantalla */
         }
         
         /* Contenedor de Flashes */
@@ -296,15 +300,24 @@
         
         /* Contenido de ejemplo para ver el efecto fijo */
         .content {
+            /* ESTILOS DE CENTRADO MODIFICADOS PARA EL CONTENIDO */
             padding: 20px;
-            color: var(--clr-text-content); /* El texto del contenido cambia según el tema */
+            color: var(--clr-text-content); 
             text-align: center;
-            /* Asegura que el contenido no quede debajo del footer */
-            min-height: calc(100vh - var(--nav-height));
             width: 100%;
             max-width: 450px;
             margin: 0 auto;
             transition: color 0.3s;
+            
+            /* NUEVOS ESTILOS PARA GESTIONAR EL ESPACIO */
+            /* Se establece el tamaño máximo del área disponible (Viewport - Navbar) */
+            max-height: calc(100vh - var(--nav-height) - 40px); /* Resta 40px de padding/margen superior e inferior */
+            /* Si el contenido excede el espacio vertical, permite scroll local */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            /* Se añade margen superior e inferior fijo para evitar solapamiento con la barra superior y la navegación */
+            padding-top: 65px; /* Para el header info */
+            padding-bottom: calc(var(--nav-height) + 20px); 
         }
         .content h1 {
             margin-bottom: 20px;
@@ -318,7 +331,8 @@
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 380px;
-            margin-top: 50px;
+            /* ELIMINADO: margin-top: 50px; (El centrado vertical lo maneja el body) */
+            margin: 0 auto; /* Asegura el centrado horizontal dentro de .content */
         }
 
         .input-group {
@@ -392,6 +406,10 @@
         .alert-danger { background-color: #f8d7da; color: #721c24; }
         .alert-info { background-color: #d1ecf1; color: #0c5460; }
         .alert-warning { background-color: #fff3cd; color: #856404; }
+        
+        /* Corrección de altura para evitar que el contenido desaparezca al centrar */
+        /* Hacemos que .content se ajuste automáticamente a su contenido si es pequeño */
+        /* Y que el body se encargue del centrado */
 
     </style>
 </head>
@@ -430,6 +448,7 @@
     </div>
 
     <!-- Contenido de la vista (Index, Login, Register, etc.) -->
+    <!-- El body centra vertical y horizontalmente este div -->
     <div class="content">
         {% block content %}{% endblock %}
     </div>

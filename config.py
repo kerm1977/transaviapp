@@ -1,89 +1,106 @@
 # config.py
 import sqlite3
 from werkzeug.security import generate_password_hash
-
-# =======================================================
-# CONFIGURACIÓN DE LA BASE DE DATOS Y LÓGICA DE USUARIOS
-# =======================================================
+from sqlite3 import IntegrityError
 
 DATABASE = 'db.db'
+# Variable para controlar si ya se ha impreso el mensaje de éxito de inicialización.
+# Esto ayuda a mitigar la doble impresión del Flask reloader.
+DB_INIT_MESSAGE_SHOWN = False 
 
-def get_db_connection():
-    """Establece y retorna la conexión a la base de datos SQLite."""
-    conn = sqlite3.connect(DATABASE)
-    # Configura la conexión para devolver filas como diccionarios
-    conn.row_factory = sqlite3.Row 
-    return conn
 
 def init_db():
     """Inicializa la base de datos y crea la tabla de usuarios si no existe."""
-    conn = get_db_connection()
+    global DB_INIT_MESSAGE_SHOWN
+    
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    
     try:
-        conn.execute('''
+        # Comando para crear la tabla si no existe
+        cursor.execute('''
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 nombre TEXT NOT NULL,
                 primer_apellido TEXT NOT NULL,
                 segundo_apellido TEXT,
-                telefono TEXT NOT NULL UNIQUE,
-                email TEXT NOT NULL UNIQUE,
-                usuario TEXT NOT NULL UNIQUE,
+                telefono TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                usuario TEXT UNIQUE NOT NULL,
                 password_hash TEXT NOT NULL
-            );
-        ''')
-        print("Tabla 'users' verificada o creada exitosamente.")
-        
-        # Opcional: Insertar un usuario de prueba si la base de datos está vacía
-        cursor = conn.execute("SELECT COUNT(*) FROM users")
-        if cursor.fetchone()[0] == 0:
-            # Hash de la contraseña "password123"
-            test_password = generate_password_hash("password123", method='pbkdf2:sha256')
-            conn.execute(
-                "INSERT INTO users (nombre, primer_apellido, segundo_apellido, telefono, email, usuario, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                ('Admin', 'User', '', '12345678', 'admin@app.com', 'admin', test_password)
             )
-            print("Usuario de prueba (admin@app.com/password123) insertado.")
-        
+        ''')
         conn.commit()
+        
+        # Este mensaje solo se imprimirá una vez por ejecución del script Python, 
+        # sin importar si la tabla ya existía o si Flask la llama dos veces.
+        if not DB_INIT_MESSAGE_SHOWN:
+            print("Base de datos 'db.db' verificada: La tabla 'users' está lista.")
+            DB_INIT_MESSAGE_SHOWN = True
+            
     except Exception as e:
         print(f"Error al inicializar la base de datos: {e}")
     finally:
         conn.close()
 
+
+# --- Funciones CRUD y de Búsqueda ---
+
+def get_db_connection():
+    """Retorna una conexión a la base de datos."""
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row  # Permite acceder a las columnas por nombre
+    return conn
+
 def get_user_by_email_or_username(identifier):
     """Busca un usuario por email o nombre de usuario."""
     conn = get_db_connection()
-    user = conn.execute(
-        "SELECT * FROM users WHERE email = ? OR usuario = ?", 
-        (identifier, identifier)
-    ).fetchone()
+    cursor = conn.cursor()
+    
+    # Intenta buscar por email
+    cursor.execute('SELECT * FROM users WHERE email = ?', (identifier,))
+    user = cursor.fetchone()
+    
+    if user is None:
+        # Si no se encuentra por email, intenta buscar por nombre de usuario
+        cursor.execute('SELECT * FROM users WHERE usuario = ?', (identifier,))
+        user = cursor.fetchone()
+        
     conn.close()
     return user
 
-def register_user(nombre, primer_apellido, segundo_apellido, telefono, email, usuario, password):
-    """Registra un nuevo usuario en la base de datos."""
+def register_user(nombre, apellido1, apellido2, telefono, email, usuario, password):
+    """Registra un nuevo usuario, manejando colisiones de UNIQUE."""
     conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    password_hash = generate_password_hash(password)
+    
     try:
-        # La contraseña se hashea antes de guardarse
-        password_hash = generate_password_hash(password, method='pbkdf2:sha256')
-        
-        conn.execute(
-            "INSERT INTO users (nombre, primer_apellido, segundo_apellido, telefono, email, usuario, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (nombre, primer_apellido, segundo_apellido, telefono, email, usuario, password_hash)
+        cursor.execute(
+            'INSERT INTO users (nombre, primer_apellido, segundo_apellido, telefono, email, usuario, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (nombre, apellido1, apellido2, telefono, email, usuario, password_hash)
         )
         conn.commit()
         return True
-    except sqlite3.IntegrityError as e:
-        # Esto captura errores de UNIQUE constraint (email, usuario, telefono ya existen)
-        if 'UNIQUE constraint failed: users.email' in str(e):
-            return 'email_exists'
-        if 'UNIQUE constraint failed: users.usuario' in str(e):
-            return 'username_exists'
-        if 'UNIQUE constraint failed: users.telefono' in str(e):
-            return 'phone_exists'
-        return 'unknown_error'
-    finally:
+    except IntegrityError as e:
         conn.close()
-
-# Asegura que la base de datos se inicialice al importar (al menos una vez)
-init_db()
+        # Analizar el error para dar un mensaje específico al usuario
+        error_message = str(e)
+        if 'email' in error_message:
+            return 'email_exists'
+        elif 'usuario' in error_message:
+            return 'username_exists'
+        elif 'telefono' in error_message:
+            return 'phone_exists'
+        else:
+            # En caso de otros errores de integridad
+            return 'integrity_error'
+    except Exception as e:
+        print(f"Error al registrar usuario: {e}")
+        conn.close()
+        return 'general_error'
+    finally:
+        # Solo cerramos la conexión si no se cerró en el IntegrityError
+        if conn:
+             conn.close()
