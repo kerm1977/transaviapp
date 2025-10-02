@@ -1,10 +1,10 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, Blueprint, session
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash # Importamos generate_password_hash
 import re
 from functools import wraps
 
 # Importa las funciones de conexión/lógica de la base de datos
-from config import get_user_by_email_or_username, register_user, init_db, get_user_by_id
+from config import get_user_by_email_or_username, register_user, init_db, get_user_by_id, update_user_password # Importamos update_user_password
 
 # Inicialización de la base de datos (asegura que db.db exista con la tabla)
 init_db()
@@ -194,6 +194,49 @@ def profile():
         flash('No se encontraron los datos del usuario. Por favor, inicia sesión de nuevo.', 'danger')
         session.clear()
         return redirect(url_for('auth.login'))
+
+@main_bp.route('/change_password', methods=['POST'])
+@is_logged_in
+def change_password():
+    """Ruta para cambiar la contraseña del usuario."""
+    user_id = session.get('user_id')
+    current_password = request.form['current_password']
+    new_password = request.form['new_password']
+    new_password_confirm = request.form['new_password_confirm']
+    
+    # 1. Obtener datos del usuario para verificar la contraseña actual
+    user = get_user_by_id(user_id)
+    
+    if not user:
+        flash('Error: Usuario no encontrado.', 'danger')
+        return redirect(url_for('main.profile'))
+
+    # 2. Verificar la contraseña actual
+    if not check_password_hash(user['password_hash'], current_password):
+        flash('La contraseña actual es incorrecta.', 'danger')
+        return redirect(url_for('main.profile'))
+
+    # 3. Validar que las nuevas contraseñas coincidan
+    if new_password != new_password_confirm:
+        flash('La nueva contraseña y su confirmación no coinciden.', 'danger')
+        return redirect(url_for('main.profile'))
+
+    # 4. Validar que la nueva contraseña no esté vacía (u otras reglas de complejidad si las hubiera)
+    if not new_password:
+        flash('La nueva contraseña no puede estar vacía.', 'danger')
+        return redirect(url_for('main.profile'))
+
+    # 5. Hashear y actualizar la contraseña
+    new_password_hash = generate_password_hash(new_password)
+    success = update_user_password(user_id, new_password_hash)
+
+    if success:
+        flash('¡Contraseña actualizada exitosamente! Por favor, vuelve a iniciar sesión por seguridad.', 'success')
+        session.clear() # Forzar el cierre de sesión por seguridad
+        return redirect(url_for('auth.login'))
+    else:
+        flash('Ocurrió un error al intentar actualizar la contraseña.', 'danger')
+        return redirect(url_for('main.profile'))
 
 
 # NUEVAS RUTAS DE NAVEGACIÓN (Públicas)

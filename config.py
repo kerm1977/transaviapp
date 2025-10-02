@@ -115,3 +115,20 @@ def register_user(nombre, apellido1, apellido2, telefono, email, usuario, passwo
         # Solo cerramos la conexión si no se cerró en el IntegrityError
         if conn:
              conn.close()
+
+def update_user_password(user_id, new_password_hash):
+    """Actualiza el password_hash de un usuario por su ID."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            'UPDATE users SET password_hash = ? WHERE id = ?',
+            (new_password_hash, user_id)
+        )
+        conn.commit()
+        return cursor.rowcount > 0 # Retorna True si se actualizó una fila
+    except Exception as e:
+        print(f"Error al actualizar la contraseña del usuario {user_id}: {e}")
+        return False
+    finally:
+        conn.close()
