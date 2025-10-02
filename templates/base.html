@@ -8,512 +8,16 @@
     <!-- Importar ionicons para los iconos -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+ 
     <!-- Incluir jQuery para las funcionalidades de Flash (opcional pero ayuda) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-
-    <!-- ======================================================= -->
-    <!-- ESTILOS CSS INLINE (Responsivo y Fijo en el Pie) -->
-    <!-- ======================================================= -->
-
-    <!-- PROHIBIDO TOCAR LOS TEMAS DEL NAVBAR -->
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif; /* Usando Inter para estética */
-        }
-
-        /* ------------------------------------------- */
-        /* TEMAS (Variables Globales) */
-        /* ------------------------------------------- */
-        :root {
-            /* Colores Base */
-            --clr-main: #ff9900; /* Naranja vibrante (activo) */
-            --clr-warning: #ffb700; /* Ámbar/Warning */
-            --clr-bg-default: #222327;
-            --nav-height: 70px;
-            
-            /* Tema por defecto (Dark original) */
-            --clr-bg: var(--clr-bg-default); 
-            --clr-nav-bg: #fff; 
-            --clr-text-content: #ffffff; 
-            --clr-icon-inactive: var(--clr-bg-default); /* Por defecto, los íconos inactivos toman el color de fondo del body */
-            --clr-card-bg: var(--clr-nav-bg); /* Variable agregada para consistencia */
-        }
-
-        .theme-light {
-            --clr-bg: #f5f5f5;
-            --clr-nav-bg: #ffffff;
-            --clr-text-content: #222327;
-            --clr-icon-inactive: #888; 
-            --clr-card-bg: #ffffff;
-        }
-
-        .theme-sepia {
-            --clr-bg: #f8e5c8;
-            --clr-nav-bg: #f9f0e2;
-            --clr-text-content: #5c4033;
-            --clr-icon-inactive: #5c4033;
-            --clr-card-bg: #f9f0e2;
-        }
-
-        .theme-dark {
-            --clr-bg: #121212;
-            --clr-nav-bg: #2d2d2d;
-            --clr-text-content: #ffffff;
-            /* CAMBIO: Íconos inactivos toman el color Warning */
-            --clr-icon-inactive: var(--clr-warning); 
-            --clr-card-bg: #2d2d2d;
-        }
-        /* ------------------------------------------- */
-        /* FIN TEMAS */
-        /* ------------------------------------------- */
-
-      /*PROHIBIDO TOCAR LOS ESTILOS DEL NAVBAR*/
-        body {
-            /* CAMBIOS APLICADOS AQUI PARA EL CENTRADO PERFECTO */
-            display: flex;
-            justify-content: center; /* Centrado Horizontal */
-            align-items: center; /* Centrado Vertical */
-            /*min-height: 100vh;*/
-            background: var(--clr-bg);
-            /* AÑADIDO: Transición suave para el fondo del body */
-            transition: background 0.3s ease-in-out; 
-            
-            /* AHORA EL BODY ES LA CAJA FLEXIBLE COMPLETA */
-            width: 100vw;
-            overflow-y: auto; /* Permite scroll si el contenido es más alto que la pantalla */
-        }
-        
-        /* Contenedor de Flashes */
-        .flash-messages {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 400px;
-            z-index: 1002;
-            padding-top: 50px;
-        }
-
-        .flash-message {
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            opacity: 0.95;
-        }
-
-        .flash-success { background-color: #4CAF50; color: white; }
-        .flash-danger { background-color: #f44336; color: white; }
-        .flash-warning { background-color: #ff9800; color: white; }
-        .flash-info { background-color: #2196F3; color: white; }
-
-        /* Estilo para el logo en la esquina superior izquierda */
-        .app-logo {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 70px; /* Tamaño solicitado */
-            height: 70px; /* Tamaño solicitado */
-            object-fit: contain; /* Asegura que la imagen se vea bien dentro de las dimensiones */
-            z-index: 1001; /* Alto, pero por debajo de los mensajes flash (1002) */
-            padding: 10px; /* Pequeño padding para no pegar al borde */
-            pointer-events: none; /* No debe interferir con los clics */
-        }
-
-
-        /* Botón de cambio de tema y usuario */
-        .nav-header-info {
-            position: fixed;
-            top: 0; /* Lo subimos a 0 para que ocupe todo el espacio superior */
-            right: 0; /* Aseguramos la posición a la derecha */
-            /* Se ajusta el ancho a 'auto' para que respete el espacio del logo en la izquierda */
-            width: auto; 
-            height: 50px; /* Le damos una altura definida */
-            
-             /* CORRECCIÓN Z-INDEX: Máximo para evitar superposición por mensajes flash (z-index: 1002) o contenido */
-            z-index: 9999; 
-            
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* Alinea los elementos a la derecha */
-            gap: 15px;
-            padding-right: 15px; /* Mantiene el padding del borde derecho */
-            padding-left: 15px; /* Añadido para consistencia */
-            pointer-events: none; /* CORRECCIÓN CLAVE: Permite clicks a través del div, excepto en los hijos */
-        }
-        
-        .nav-header-info > * {
-             pointer-events: auto; /* Hace que los hijos (span, a, button) sean clicables */
-        }
-        
-        .nav-header-info span {
-            color: var(--clr-text-content);
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-
-        #theme-toggle {
-            /* Posicionamiento y Estilo */
-            background: none;
-            border: none;
-            color: var(--clr-text-content); /* Color del ícono basado en el tema */
-            cursor: pointer;
-            /* CORRECCIÓN #1: Quitamos el padding del padre y definimos un tamaño fijo para asegurar el área de clic. */
-            padding: 0; 
-            width: 38px;
-            height: 38px;
-            font-size: 1.8em; /* Tamaño del ícono */
-            
-            /* Usamos Flexbox para centrar el ícono dentro del área fija. */
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            
-            transition: color 0.3s, transform 0.2s;
-            /* z-index explícito para el botón */
-            z-index: 10; 
-        }
-        #theme-toggle:hover {
-            transform: scale(1.1); /* Efecto hover */
-        }
-        /* Rotación del ícono de engranaje para hacerlo interactivo */
-        #theme-toggle ion-icon {
-            /* CORRECCIÓN #2: Ajustamos el line-height y la alineación del ícono Ionicon */
-            line-height: normal; 
-            vertical-align: middle;
-            transition: transform 0.8s ease-in-out;
-            padding: 5px; /* Añadimos un pequeño padding al ícono para el "hitbox" táctil */
-        }
-
-
-        /* Contenedor principal de la navegación: Fijo y 100% de ancho */
-        .navigation {
-            position: fixed; /* Lo fija en la pantalla */
-            bottom: 0; /* Lo coloca en el pie de la página */
-            
-            /* CENTRADO PERFECTO: */
-            left: 50%; /* Mueve el punto de inicio al 50% de la izquierda del viewport */
-            transform: translateX(-50%); /* Desplaza el elemento hacia la izquierda el 50% de su propio ancho */
-            /* Fin Centrado */
-            
-            width: 100%; /* Ocupa todo el ancho de la pantalla */
-            max-width: 450px; /* Limita el ancho en pantallas grandes (desktop) */
-            height: var(--nav-height);
-            background: var(--clr-nav-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 0; 
-            border-top-left-radius: 15px; 
-            border-top-right-radius: 15px;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000; /* Asegura que esté por encima del contenido */
-            transition: background 0.3s; /* Suaviza el cambio de fondo de la barra */
-        }
-
-        .navigation ul {
-            display: flex;
-            width: 100%; 
-            padding: 0 10px;
-        }
-
-        .navigation ul li {
-            position: relative;
-            list-style: none;
-            width: 20%; 
-            flex-grow: 1;
-            height: var(--nav-height);
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .navigation ul li a {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            width: 100%;
-            text-align: center;
-            font-weight: 500;
-            text-decoration: none;
-            height: 100%; /* Asegura que el enlace ocupe todo el LI */
-        }
-
-        .navigation ul li a .icon {
-            position: relative;
-            display: block;
-            font-size: 1.5em;
-            text-align: center;
-            transition: 0.5s;
-            /* CAMBIO: Íconos inactivos usan la variable de color dinámica */
-            color: var(--clr-icon-inactive); 
-            padding-top: 18px; 
-            pointer-events: none; 
-        }
-
-        /* Transformación del ícono original (hacia arriba) */
-        .navigation ul li.active a .icon {
-            transform: translateY(-32px);
-            /* Ocultamos completamente el ícono original */
-            opacity: 0;
-            padding-top: 0; 
-        }
-
-        .navigation ul li a .text {
-            position: absolute;
-            color: var(--clr-main);
-            font-weight: 600;
-            font-size: 0.75em;
-            letter-spacing: 0.05em;
-            transition: 0.5s;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        /* Mostrar texto con color naranja cuando está activo */
-        .navigation ul li.active a .text {
-            opacity: 1;
-            transform: translateY(10px);
-        }
-
-        /* --- Indicador de la Magia (Color Naranja) --- */
-        .indicator {
-            position: absolute;
-            top: -50%;
-            width: 60px; 
-            height: 60px;
-            background: var(--clr-main);
-            border-radius: 50%;
-            border: 6px solid var(--clr-bg); /* Borde toma el color del fondo principal */
-            transition: 0.5s;
-            transform: translateX(0); /* Inicialmente centrado por JS */
-            
-            /* Configuración para centrar el ícono inyectado */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; 
-        }
-        
-        /* Ícono inyectado que vive dentro del indicador */
-        .indicator .dot-icon {
-            color: #000; /* Ícono negro dentro del círculo naranja */
-            font-size: 1.5em;
-            /* Transición más lenta para un fade suave */
-            opacity: 1; 
-            transition: opacity 1.0s ease-in-out; 
-            line-height: 1; 
-        }
-        
-
-        /* Efecto de curva a la izquierda (corte) */
-        .indicator::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: -22px;
-            width: 20px;
-            height: 20px;
-            background: transparent;
-            border-top-right-radius: 20px;
-            box-shadow: 1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
-        }
-
-        /* Efecto de curva a la derecha (corte) */
-        .indicator::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: -22px;
-            width: 20px;
-            height: 20px;
-            background: transparent;
-            border-top-left-radius: 20px;
-            box-shadow: -1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
-        }
-        
-        /* Contenido de ejemplo para ver el efecto fijo */
-        .content {
-            /* ESTILOS DE CENTRADO MODIFICADOS PARA EL CONTENIDO */
-            padding: 20px;
-            color: var(--clr-text-content); 
-            text-align: center;
-            width: 100%;
-            max-width: 450px;
-            margin: 0 auto;
-            /* AÑADIDO: Transición de opacidad para el fade-in/out */
-            transition: opacity 0.2s ease-in-out, color 0.3s;
-            
-            /* NUEVOS ESTILOS PARA GESTIONAR EL ESPACIO */
-            /* Se establece el tamaño máximo del área disponible (Viewport - Navbar) */
-            max-height: calc(100vh - var(--nav-height) - 40px); /* Resta 40px de padding/margen superior e inferior */
-            /* Si el contenido excede el espacio vertical, permite scroll local */
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-            /* Se añade margen superior e inferior fijo para evitar solapamiento con la barra superior y la navegación */
-            padding-top: 65px; /* Para el header info */
-            padding-bottom: calc(var(--nav-height) + 20px); 
-
-            /* --- CAMBIO CLAVE PARA OCULTAR EL SCROLLBAR DEL CONTENEDOR PRINCIPAL --- */
-            /* Ocultar scrollbar de Webkit (Chrome, Safari) */
-            &::-webkit-scrollbar {
-                display: none;
-            }
-            /* Ocultar scrollbar de IE and Edge */
-            -ms-overflow-style: none;  
-            /* Ocultar scrollbar de Firefox */
-            scrollbar-width: none;
-            /* ----------------------------------------------------------------------- */
-        }
-        
-        /* Estado inicial al cargar la página */
-        .content.page-loading {
-            opacity: 0;
-        }
-
-        /* Estado final después de que la página termina de cargar (se activa en JS) */
-        .content.page-loaded {
-            opacity: 1;
-        }
-        
-        .content h1 {
-            margin-bottom: 20px;
-        }
-        
-        /* Estilos para formularios de Login/Registro */
-        .auth-card {
-            background: none; /* ELIMINADO: Fondo para eliminar el efecto "card" */
-            padding: 0; /* ELIMINADO: Padding para que se extienda completamente */
-            border-radius: 0; /* ELIMINADO: Borde redondeado */
-            box-shadow: none; /* ELIMINADO: Sombra */
-            
-            width: 100%;
-            max-width: 380px;
-            margin: 0 auto; /* Asegura el centrado horizontal dentro de .content */
-        }
-        
-        /* Ajustamos el padding de los inputs para mantener el espaciado visual */
-        .auth-card .input-group {
-             margin-bottom: 25px;
-             /* Aseguramos que los inputs tomen el espacio del card anterior */
-             padding: 0 10px; 
-        }
-        
-        .auth-card p {
-            /* Mantenemos el padding inferior para el texto */
-             padding: 0 10px; 
-        }
-        
-        /* APLICAR ALINEACIÓN CENTRAL Y ESPACIADO DEL CONTENIDO DEL FORMULARIO */
-        .auth-card form {
-             background: var(--clr-card-bg); /* Mantenemos el fondo del tema para que el formulario se vea en modo oscuro/claro */
-             padding: 30px; 
-             border-radius: 15px; 
-             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Una sombra muy ligera para destacarlo del fondo */
-        }
-        
-        /* SOBREESCRIBIR el estilo del grupo de inputs para que no tengan padding extra */
-        .auth-card form .input-group {
-             padding: 0;
-        }
-        
-        .auth-card h1 {
-            /* Estilo para el título fuera del card/form */
-            margin-bottom: 30px !important;
-        }
-
-
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--clr-text-content);
-            font-weight: 500;
-        }
-
-        .input-group input[type="text"],
-        .input-group input[type="password"],
-        .input-group input[type="email"] {
-            width: 100%;
-            padding: 12px 40px 12px 15px; /* Más padding a la derecha para el ícono */
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            /* CAMBIO: Usamos var(--clr-bg) para el fondo del input y var(--clr-text-content) para el color de la letra */
-            background: var(--clr-bg);
-            color: var(--clr-text-content);
-            transition: border-color 0.3s;
-        }
-        
-        .input-group input:focus {
-            border-color: var(--clr-main);
-            outline: none;
-        }
-        
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(2px); /* Ajuste fino */
-            cursor: pointer;
-            color: #888;
-        }
-        .toggle-password:hover {
-            color: var(--clr-main);
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--clr-main);
-            color: #000;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: opacity 0.3s, background-color 0.3s;
-            opacity: 1;
-        }
-        
-        .btn-primary:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Estilos para mensajes Flash */
-        .alert {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        .alert-success { background-color: #d4edda; color: #155724; }
-        .alert-danger { background-color: #f8d7da; color: #721c24; }
-        .alert-info { background-color: #d1ecf1; color: #0c5460; }
-        .alert-warning { background-color: #fff3cd; color: #856404; }
-        
-    </style>
 </head>
 
 <!-- El tema se establece dinámicamente en el script de abajo -->
 <body class="theme-dark"> 
     
-    <!-- NUEVA ESTRUCTURA: LOGO SUPERIOR IZQUIERDA (150px x 150px) -->
+    <!-- ESTRUCTURA 1: LOGO SUPERIOR IZQUIERDA (150px x 150px) -->
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="App Logo" class="app-logo">
 
     <!-- Contenedor para mensajes flash -->
@@ -526,25 +30,35 @@
             {% endif %}
         {% endwith %}
     </div>
-
-
-    <!-- Barra Superior: Muestra el nombre del usuario y el botón de tema -->
-    <div class="nav-header-info">
-        <!-- Mostrar nombre del usuario si está logueado -->
-        {% if session.logged_in %}
-            <span>Hola, {{ session.full_name.split(' ')[0] }}</span>
-            <a href="{{ url_for('auth.logout') }}" title="Cerrar Sesión" style="color: var(--clr-warning); font-size: 1.5em;">
-                <ion-icon name="log-out-outline"></ion-icon>
-            </a>
-        {% else %}
-            <!-- Si no está logueado, se deja vacío o se pone un placeholder, pero el botón de tema permanece -->
-        {% endif %}
-
-        <!-- Botón de cambio de tema: AQUI NO SE PUEDE MOVER NI MODIFICAR ABSOLUTAMENTE NADA DE EL  -->
-        <button id="theme-toggle" title="Cambiar Tema">
-            <ion-icon name="color-palette-outline"></ion-icon>
-        </button>
+    
+    <!-- NUEVO WRAPPER CENTRADO CON Z-INDEX BAJO (1000) -->
+    <div class="header-title-wrapper">
+        <!-- TÍTULO CENTRADO -->
+        <div class="app-title">TRANSAVI C.R.</div>
     </div>
+
+
+    <!-- ESTRUCTURA 2: BARRA SUPERIOR CON TÍTULO Y BOTONES -->
+    <div class="nav-header-container">
+        <!-- Barra Superior Derecha: Muestra el nombre del usuario y el botón de tema -->
+        <div class="nav-header-info">
+            <!-- Mostrar nombre del usuario si está logueado -->
+            {% if session.logged_in %}
+                <span>Hola, {{ session.full_name.split(' ')[0] }}</span>
+                <a href="{{ url_for('auth.logout') }}" title="Cerrar Sesión" style="color: var(--clr-warning); font-size: 1.5em;">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                </a>
+            {% else %}
+                <!-- Si no está logueado, se deja vacío o se pone un placeholder, pero el botón de tema permanece -->
+            {% endif %}
+
+            <!-- Botón de cambio de tema: AQUI NO SE PUEDE MOVER NI MODIFICAR ABSOLUTAMENTE NADA DE EL  -->
+            <button id="theme-toggle" title="Cambiar Tema">
+                <ion-icon name="color-palette-outline"></ion-icon>
+            </button>
+        </div>
+    </div>
+
 
     <!-- Contenido de la vista (Index, Login, Register, etc.) -->
     <!-- El body centra vertical y horizontalmente este div -->
@@ -553,7 +67,7 @@
         <!-- Mostramos el título de la página si se pasó como argumento (para las nuevas rutas) -->
         {% if page_title and page_title != "Inicio" %}
             <h1 style="font-size: 2.5em; margin-bottom: 20px; color: var(--clr-main);">
-                <ion-icon name="{{ 'chatbubble-outline' if page_title == 'Mensajes' else ('camera-outline' if page_title == 'Fotos' else 'settings-outline') }}" style="vertical-align: middle;"></ion-icon>
+                <ion-icon name="{{ 'chatbubble-outline' if page_title == 'Mensajes' else ('camera-outline' if page_title == 'Fotos' else ('person-circle-outline' if page_title == 'Mi Perfil' else 'settings-outline')) }}" style="vertical-align: middle;"></ion-icon>
                 {{ page_title }}
             </h1>
             <p style="font-size: 1.1em; margin-bottom: 30px; color: var(--clr-text-content);">
@@ -580,12 +94,12 @@
                 </a>
             </li>
             
-            <!-- ENLACE DINÁMICO DE PERFIL/LOGIN -->
-            <li class="list" data-icon-name="person-outline" data-path="auth">
+            <!-- ENLACE DINÁMICO DE PERFIL/LOGIN (ACTUALIZADO) -->
+            <li class="list" data-icon-name="person-circle-outline" data-path="{{ 'profile' if session.logged_in else 'auth' }}">
                 <!-- Único enlace que mantiene la lógica condicional -->
-                <a href="{{ url_for('main.index') if session.logged_in else url_for('auth.login') }}">
+                <a href="{{ url_for('main.profile') if session.logged_in else url_for('auth.login') }}">
                     <span class="icon">
-                        <ion-icon name="person-outline"></ion-icon>
+                        <ion-icon name="person-circle-outline"></ion-icon>
                     </span>
                     <span class="text">
                         {% if session.logged_in %}Perfil{% else %}Acceder{% endif %}
@@ -635,203 +149,7 @@
     <!-- ======================================================= -->
     <!-- COMPORTAMIENTO JAVASCRIPT (Responsivo, Centrado y Temas) -->
     <!-- ======================================================= -->
-    <script>
-        const list = document.querySelectorAll('.list');
-        const indicator = document.querySelector('.indicator');
-        const body = document.body;
-        const themeToggleButton = document.getElementById('theme-toggle');
-        const mainContent = document.getElementById('main-content'); // Nuevo: Referencia al div de contenido
-
-        // ===========================================
-        // FUNCIONES GLOBALES REQUERIDAS
-        // ===========================================
-
-        function getPathname() {
-            // Retorna la ruta base (ej: /auth/login, /messages) sin el origen
-            const path = window.location.pathname.replace(/^\/|\/$/g, '');
-            
-            if (path.startsWith('auth/')) {
-                 return 'auth';
-            }
-            return path;
-        }
-
-        // -------------------------------------------
-        // Lógica de Temas con Persistencia (localStorage)
-        // -------------------------------------------
-        const themes = ['theme-dark', 'theme-light', 'theme-sepia'];
-        const localStorageKey = 'appTheme'; // Clave para guardar en localStorage
-
-        function getCurrentThemeIndex() {
-            for (let i = 0; i < themes.length; i++) {
-                if (body.classList.contains(themes[i])) {
-                    return i;
-                }
-            }
-            return 0; // Por defecto 'theme-dark'
-        }
-        
-        function applyTheme(themeClass, initialLoad = false) {
-            themes.forEach(t => body.classList.remove(t));
-            body.classList.add(themeClass);
-            
-            if (!initialLoad) {
-                 const newIndex = getCurrentThemeIndex();
-                 const iconElement = themeToggleButton.querySelector('ion-icon');
-                 iconElement.style.transform = `rotate(${newIndex * 120}deg)`; 
-                 localStorage.setItem(localStorageKey, themeClass);
-            }
-        }
-
-        function toggleTheme() {
-            const currentThemeIndex = getCurrentThemeIndex();
-            let newThemeIndex = (currentThemeIndex + 1) % themes.length;
-            const newTheme = themes[newThemeIndex];
-            
-            applyTheme(newTheme, false); 
-            
-            const activeItem = document.querySelector('.list.active');
-            if (activeItem) {
-                setTimeout(() => moveIndicator(activeItem), 50); 
-            }
-        }
-        
-        function loadInitialTheme() {
-            const savedTheme = localStorage.getItem(localStorageKey);
-            if (savedTheme && themes.includes(savedTheme)) {
-                applyTheme(savedTheme, true); 
-            } else {
-                applyTheme('theme-dark', true); 
-            }
-            
-            const initialIndex = getCurrentThemeIndex();
-            const iconElement = themeToggleButton.querySelector('ion-icon');
-            iconElement.style.transform = `rotate(${initialIndex * 120}deg)`; 
-        }
-
-        loadInitialTheme();
-        
-        themeToggleButton.addEventListener('click', toggleTheme);
-
-
-        // -------------------------------------------
-        // Lógica de Navbar y Movimiento
-        // -------------------------------------------
-
-        function updateIndicatorContent(element) {
-            const iconName = element.getAttribute('data-icon-name');
-            const iconHtml = `<span class="dot-icon"><ion-icon name="${iconName}"></ion-icon></span>`;
-            
-            indicator.innerHTML = iconHtml;
-            
-            const dotIcon = indicator.querySelector('.dot-icon');
-            setTimeout(() => {
-                if (dotIcon) {
-                    dotIcon.style.opacity = '1';
-                }
-            }, 500); 
-        }
-
-        function moveIndicator(element) {
-            const listWidth = element.offsetWidth;
-            const indicatorWidth = indicator.offsetWidth;
-            const offset = element.offsetLeft + (listWidth / 2) - (indicatorWidth / 2);
-
-            const currentDotIcon = indicator.querySelector('.dot-icon');
-            if (currentDotIcon) {
-                currentDotIcon.style.opacity = '0';
-            }
-
-            indicator.style.transition = '0.5s';
-            indicator.style.transform = `translateX(${offset}px)`;
-            
-            updateIndicatorContent(element);
-        }
-
-        function highlightActiveLink() {
-            const path = getPathname(); 
-            let activeItem = null;
-            
-            list.forEach((item) => {
-                item.classList.remove('active');
-            });
-            
-            activeItem = document.querySelector(`[data-path="${path}"]`);
-
-            if (!activeItem && (path === '' || path === 'main' || path.includes('index'))) {
-                activeItem = document.querySelector('[data-path="index"]');
-            }
-            
-            if (!activeItem) {
-                activeItem = document.querySelector('[data-path="index"]');
-            }
-
-
-            if (activeItem) {
-                activeItem.classList.add('active');
-                moveIndicator(activeItem);
-            }
-        }
-
-        // --- FUNCIÓN DE NAVEGACIÓN SUAVIZADA ---
-        function smoothNavigate(e) {
-            // Previene la navegación inmediata del enlace
-            e.preventDefault();
-            
-            const listItem = e.currentTarget.closest('.list');
-            const targetUrl = e.currentTarget.href;
-
-            // 1. Oculta el contenido antes de la recarga
-            mainContent.style.opacity = '0'; 
-
-            // 2. Mueve el indicador inmediatamente
-            list.forEach((i) => i.classList.remove('active'));
-            listItem.classList.add('active');
-            moveIndicator(listItem);
-
-            // 3. Espera a que la animación CSS del indicador termine (0.5s + 50ms buffer)
-            setTimeout(() => {
-                // 4. Navega a la nueva URL (esto recarga toda la página)
-                window.location.href = targetUrl;
-            }, 550); 
-        }
-
-        // Reasignar el evento de click para usar la función smoothNavigate
-        list.forEach((item) => {
-            const link = item.querySelector('a');
-            if (link) {
-                 // Eliminamos cualquier listener anterior (para limpiar el estado)
-                 link.removeEventListener('click', smoothNavigate);
-                 
-                 // Añadimos el nuevo smoothNavigate
-                 link.addEventListener('click', smoothNavigate);
-            }
-        });
-        
-        // Inicialización y Responsividad
-        window.addEventListener('load', () => {
-             highlightActiveLink();
-             // Añadido: Hace visible el contenido después de que el indicador se ha movido
-             mainContent.classList.remove('page-loading');
-             mainContent.classList.add('page-loaded');
-        });
-        
-        window.addEventListener('resize', () => {
-             const activeItem = document.querySelector('.list.active');
-             if (activeItem) {
-                moveIndicator(activeItem);
-             }
-        });
-        
-        // Ocultar mensajes flash después de 5 segundos
-        $(document).ready(function() {
-            window.setTimeout(function() {
-                $(".flash-message").fadeTo(500, 0).slideUp(500, function(){
-                    $(this).remove(); 
-                });
-            }, 5000); // 5 segundos
-        });
-
-    </script>
+    <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
 </body>
 </html>

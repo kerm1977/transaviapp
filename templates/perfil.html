@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil{% endblock %}
+
+{% block content %}
+    
+    <!-- Contenedor del Dashboard de Perfil -->
+    <div class="profile-dashboard-container">
+        
+        <!-- Contenedor de diseño (sin apariencia de tarjeta) -->
+        <div class="profile-layout">
+            
+            <!-- Icono de Perfil Grande -->
+            <div class="profile-avatar">
+                <ion-icon name="person-circle-outline"></ion-icon>
+            </div>
+            
+            <!-- Nombre Completo y Usuario -->
+            <h2 class="text-3xl font-bold mb-1" style="color: var(--clr-main);">
+                {{ profile_data.full_name }}
+            </h2>
+            <p class="text-lg mb-6" style="color: var(--clr-text-content); opacity: 0.7;">
+                @{{ profile_data.username }}
+            </p>
+            
+            <hr class="profile-divider">
+
+            <!-- Sección de Detalles del Contacto -->
+            <div class="contact-details mt-6">
+                
+                <!-- Detalle 1: Correo Electrónico -->
+                <div class="detail-item">
+                    <ion-icon name="mail-outline" style="color: var(--clr-warning);"></ion-icon>
+                    <div class="detail-content">
+                        <span class="detail-label">Correo Electrónico</span>
+                        <span class="detail-value">{{ profile_data.email }}</span>
+                    </div>
+                </div>
+
+                <!-- Detalle 2: Teléfono -->
+                <div class="detail-item">
+                    <ion-icon name="call-outline" style="color: var(--clr-warning);"></ion-icon>
+                    <div class="detail-content">
+                        <span class="detail-label">Teléfono</span>
+                        <span class="detail-value">{{ profile_data.telefono }}</span>
+                    </div>
+                </div>
+                
+                <!-- Detalle 3: ID de Usuario (Identificador Interno) -->
+                <div class="detail-item">
+                    <ion-icon name="key-outline" style="color: var(--clr-warning);"></ion-icon>
+                    <div class="detail-content">
+                        <span class="detail-label">ID de Usuario</span>
+                        <span class="detail-value text-sm text-gray-400">{{ profile_data.id }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <hr class="profile-divider">
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons mt-6">
+                <a href="#" class="btn-secondary">
+                    <ion-icon name="create-outline"></ion-icon> Editar Información
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="btn-danger">
+                    <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* Estilos específicos para la vista de Perfil */
+    
+    .profile-dashboard-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        width: 100%;
+        padding: 0; 
+    }
+
+    .profile-layout {
+        background: transparent;
+        color: var(--clr-text-content);
+        padding: 10px 0;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+        transition: color 0.3s;
+    }
+
+    .profile-avatar {
+        font-size: 5em;
+        color: var(--clr-main);
+        margin-bottom: 10px;
+    }
+
+    .profile-divider {
+        border: 0;
+        height: 1px;
+        background: var(--clr-text-content);
+        opacity: 0.3;
+        margin: 25px 0;
+    }
+
+    .contact-details {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        text-align: left;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        /* Se asume una variable RGB definida en base.css o se usa un valor fijo */
+        background: rgba(255, 153, 0, 0.05); 
+        padding: 12px 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 153, 0, 0.2); 
+    }
+    
+    .detail-item ion-icon {
+        font-size: 1.5em;
+        min-width: 20px;
+    }
+
+    .detail-content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 0.8em;
+        font-weight: 500;
+        color: var(--clr-warning);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+        font-size: 1em;
+        font-weight: 400;
+        color: var(--clr-text-content);
+        word-break: break-all;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .btn-secondary, .btn-danger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background-color 0.3s, opacity 0.3s;
+        text-decoration: none;
+        cursor: pointer;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .btn-secondary ion-icon, .btn-danger ion-icon {
+        margin-right: 8px;
+        font-size: 1.2em;
+    }
+
+    .btn-secondary {
+        background-color: var(--clr-warning);
+        color: #000;
+    }
+    .btn-secondary:hover {
+        opacity: 0.9;
+    }
+
+    .btn-danger {
+        background-color: #f44336; 
+        color: white;
+    }
+    .btn-danger:hover {
+        opacity: 0.9;
+    }
+    
+    @media (max-width: 450px) {
+        .profile-layout {
+            padding: 10px;
+        }
+    }
+</style>
+{% endblock %}

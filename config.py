@@ -69,6 +69,17 @@ def get_user_by_email_or_username(identifier):
     conn.close()
     return user
 
+def get_user_by_id(user_id):
+    """Busca un usuario por su ID (usado después del login para obtener detalles)."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM users WHERE id = ?', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+    # Retorna un diccionario con los datos o None
+    return dict(user) if user else None
+
+
 def register_user(nombre, apellido1, apellido2, telefono, email, usuario, password):
     """Registra un nuevo usuario, manejando colisiones de UNIQUE."""
     conn = get_db_connection()

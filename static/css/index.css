@@ -1,0 +1,93 @@
+/* Estilos específicos para la sección de pestañas */
+.service-selection-container {
+    padding-top: 20px;
+}
+.main-title {
+    text-shadow: 0 0 5px rgba(255, 153, 0, 0.4);
+    margin-top: 50px;
+}
+
+/* NUEVO ESTILO: Aplica el color de texto dinámico a la instrucción */
+.service-instruction-text {
+    color: var(--clr-warning-text);
+    font-weight: 500;
+    display: block; /* Opcional: para que tome su propia línea debajo del título principal */
+    font-size: 0.8em; /* Ajuste para que se vea más como instrucción */
+}
+
+
+@media (max-width: 768px) {
+.main-title {
+    text-shadow: 0 0 5px rgba(255, 153, 0, 0.4);
+    margin-top: 30px;
+}
+}
+
+.tabs-container {
+    width: 100%;
+    max-width: 400px;
+    /* Se eliminó el fondo (card) y la sombra */
+    background: transparent;
+    border-radius: 10px;
+    overflow: hidden;
+    /* Se eliminó el box-shadow */
+}
+
+.tab-buttons {
+    display: flex;
+    /* Mantener el separador de botones, pero quizás ajustarlo si el fondo es oscuro */
+    border-bottom: 2px solid var(--clr-bg); 
+}
+
+.tab-button {
+    flex: 1;
+    padding: 15px 10px;
+    background: var(--clr-nav-bg);
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 0.9em;
+    color: var(--clr-text-content);
+    opacity: 0.6;
+    transition: 0.3s;
+    border-bottom: 3px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tab-button:hover {
+    opacity: 0.8;
+}
+
+.tab-button.active {
+    opacity: 1;
+    color: var(--clr-main);
+    border-bottom: 3px solid var(--clr-main);
+    background: var(--clr-bg); /* Un ligero cambio de fondo para resaltar */
+}
+
+.tab-content {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--clr-text-content);
+    line-height: 1.5;
+}
+
+.tab-content p {
+    margin-bottom: 15px;
+}
+
+.service-button {
+    display: inline-block;
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: var(--clr-main);
+    color: #000;
+    transition: background-color 0.3s;
+}
+
+.service-button:hover {
+    background-color: var(--clr-warning);
+}

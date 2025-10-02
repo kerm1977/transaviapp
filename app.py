@@ -4,7 +4,7 @@ import re
 from functools import wraps
 
 # Importa las funciones de conexión/lógica de la base de datos
-from config import get_user_by_email_or_username, register_user, init_db
+from config import get_user_by_email_or_username, register_user, init_db, get_user_by_id
 
 # Inicialización de la base de datos (asegura que db.db exista con la tabla)
 init_db()
@@ -66,7 +66,8 @@ def login():
             session.permanent = remember
             
             flash('¡Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('main.index'))
+            # Redirigir a la vista de perfil después de un login exitoso
+            return redirect(url_for('main.profile'))
         else:
             flash('Email/Usuario o Contraseña incorrectos.', 'danger')
             return render_template('login.html')
@@ -165,6 +166,36 @@ def index():
     """Ruta principal (Pública)."""
     return render_template('index.html')
 
+@main_bp.route('/profile')
+@is_logged_in
+def profile():
+    """Vista de Perfil de Usuario (Privada, tipo Dashboard)."""
+    user_id = session.get('user_id')
+    user_data = get_user_by_id(user_id)
+    
+    if user_data:
+        # Mostrar el segundo apellido solo si existe
+        full_name = f"{user_data['nombre']} {user_data['primer_apellido']}"
+        if user_data['segundo_apellido']:
+            full_name += f" {user_data['segundo_apellido']}"
+            
+        # Pasar solo los datos necesarios al template
+        profile_data = {
+            'full_name': full_name,
+            'username': user_data['usuario'],
+            'email': user_data['email'],
+            'telefono': user_data['telefono'],
+            'id': user_data['id']
+        }
+        # IMPORTANTE: Ya NO pasamos page_title="Mi Perfil" para evitar la cabecera duplicada.
+        return render_template('perfil.html', profile_data=profile_data)
+    else:
+        # En caso de que el user_id en la sesión no sea válido
+        flash('No se encontraron los datos del usuario. Por favor, inicia sesión de nuevo.', 'danger')
+        session.clear()
+        return redirect(url_for('auth.login'))
+
+
 # NUEVAS RUTAS DE NAVEGACIÓN (Públicas)
 @main_bp.route('/messages')
 # @is_logged_in <--- ELIMINADO
@@ -195,7 +226,8 @@ app.register_blueprint(main_bp, url_prefix='/')
 @app.route('/')
 def home():
     if 'logged_in' in session and session['logged_in']:
-        return redirect(url_for('main.index'))
+        # Si está logueado, redirigir al perfil (como página principal de usuario)
+        return redirect(url_for('main.profile'))
     else:
         # CAMBIADO: Redirigir a Index (página pública) en lugar de login si la app es pública
         return redirect(url_for('main.index'))
@@ -259,8 +291,7 @@ if __name__ == '__main__':
 
 # Cuando se cambia de repositorio
 # git remote -v
-# git remote add origin <URL_DEL_REPOSITORIO>
-# git remote set-url origin <NUEVA_URL_DEL_REPOSITORIO>
+# git remote add origin <URL_DEL_REPOSITORIO>\r\n# git remote set-url origin <NUEVA_URL_DEL_REPOSITORIO>
 # git branchgit remote -v
 # git push -u origin flet
 
@@ -278,9 +309,3 @@ if __name__ == '__main__':
 # (env) 23:33 ~/LATRIBU1 (main)$ flask db migrate -m "Initial migration with all models"
 # (env) 23:34 ~/LATRIBU1 (main)$ flask db upgrade
 # (env) 23:34 ~/LATRIBU1 (main)$ ls -l instance/db
-
-
-# GUARDA  todas las dependecias para utilizar offline luego
-# pip download -r requirements.txt -d librerias_offline
-# INSTALA  todas las dependecias para utilizar offline luego
-# pip install --no-index --find-links=./librerias_offline -r requirements.txt

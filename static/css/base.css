@@ -1,0 +1,580 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif; /* Usando Inter para estética */
+}
+
+/* ------------------------------------------- */
+/* TEMAS (Variables Globales) */
+/* ------------------------------------------- */
+:root {
+    /* Colores Base */
+    --clr-main: #ff9900; /* Naranja vibrante (activo) */
+    --clr-warning: #ffb700; /* Ámbar/Warning */
+    --clr-bg-default: #222327;
+    --nav-height: 70px;
+    --header-height: 70px; /* Nueva variable para la altura del header */
+    --logo-size: 70px; /* Nueva variable para el tamaño del logo */
+    
+    /* Tema por defecto (Dark original) */
+    --clr-bg: var(--clr-bg-default); 
+    --clr-nav-bg: #fff; 
+    --clr-text-content: #ffffff; 
+    --clr-icon-inactive: var(--clr-bg-default); /* Por defecto, los íconos inactivos toman el color de fondo del body */
+    --clr-card-bg: var(--clr-nav-bg); /* Variable agregada para consistencia */
+    
+    /* NUEVA VARIABLE: Color específico para el texto de advertencia/instrucción */
+    --clr-warning-text: var(--clr-warning); /* Por defecto en Dark, usa Warning */
+}
+
+.theme-light {
+    --clr-bg: #f5f5f5;
+    --clr-nav-bg: #ffffff;
+    --clr-text-content: #222327;
+    --clr-icon-inactive: #888; 
+    --clr-card-bg: #ffffff;
+    
+    /* Regla del usuario: Dark en Light */
+    --clr-warning-text: #222327; 
+}
+
+.theme-sepia {
+    --clr-bg: #f8e5c8;
+    --clr-nav-bg: #f9f0e2;
+    --clr-text-content: #5c4033;
+    --clr-icon-inactive: #5c4033;
+    --clr-card-bg: #f9f0e2;
+
+    /* Regla del usuario: Café en Sepia */
+    --clr-warning-text: #5c4033;
+}
+
+.theme-dark {
+    --clr-bg: #121212;
+    --clr-nav-bg: #2d2d2d;
+    --clr-text-content: #ffffff;
+    --clr-icon-inactive: var(--clr-warning); 
+    --clr-card-bg: #2d2d2d;
+    
+    /* Regla del usuario: Warning en Dark (ya es el default, pero lo especificamos) */
+    --clr-warning-text: var(--clr-warning); 
+}
+/* ------------------------------------------- */
+/* FIN TEMAS */
+/* ------------------------------------------- */
+
+/*PROHIBIDO TOCAR LOS ESTILOS DEL NAVBAR*/
+body {
+    /* CAMBIOS APLICADOS AQUI PARA EL CENTRADO PERFECTO */
+    display: flex;
+    justify-content: center; /* Centrado Horizontal */
+    align-items: center; /* Centrado Vertical */
+    /*min-height: 100vh;*/
+    background: var(--clr-bg);
+    /* AÑADIDO: Transición suave para el fondo del body */
+    transition: background 0.3s ease-in-out; 
+    
+    /* AHORA EL BODY ES LA CAJA FLEXIBLE COMPLETA */
+    width: 100vw;
+    overflow-y: auto; /* Permite scroll si el contenido es más alto que la pantalla */
+}
+
+/* Contenedor de Flashes */
+.flash-messages {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 400px;
+    z-index: 1002;
+    padding-top: 50px;
+}
+
+.flash-message {
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    opacity: 0.95;
+}
+
+.flash-success { background-color: #4CAF50; color: white; }
+.flash-danger { background-color: #f44336; color: white; }
+.flash-warning { background-color: #ff9800; color: white; }
+.flash-info { background-color: #2196F3; color: white; }
+
+/* Estilo para el logo en la esquina superior izquierda */
+.app-logo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--logo-size); /* Usando variable */
+    height: var(--logo-size); /* Usando variable */
+    object-fit: contain; 
+    z-index: 1001; 
+    padding: 10px; 
+    pointer-events: none; 
+    margin-top: 8px;
+}
+
+/* Contenedor principal de la barra superior, cubre el espacio entre el logo y la derecha */
+.nav-header-container {
+    position: fixed;
+    top: 0;
+    left: var(--logo-size); /* Inicia después del logo */
+    right: 0;
+    height: var(--header-height); /* Usando variable */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; 
+    z-index: 9999;
+    padding-right: 15px; 
+}
+
+/* Contenedor FLEX para centrar el título - AJUSTADO PARA CENTRADO PERFECTO */
+.header-title-wrapper {
+    position: fixed;
+    top: 0;
+    left: var(--logo-size); /* Inicia después del logo (70px) */
+    right: 80px; /* Deja espacio para el botón de tema (38px) y padding (15px) */
+    height: var(--header-height); /* Ocupa la altura total del header */
+    
+    /* Centrado con Flexbox */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    /* Z-index bajo para que no interfiera con el logo (1001) ni el botón (1001) */
+    z-index: 1000; 
+    
+    pointer-events: none; /* Permite clics a través del contenedor */
+}
+
+/* Botón de cambio de tema y usuario (dentro del contenedor) */
+.nav-header-info {
+    /* Ahora solo gestiona los elementos del usuario y el tema */
+    height: 100%; /* Asegura que la altura del padre lo controle */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Alinea los elementos a la derecha */
+    gap: 15px;
+    pointer-events: none; /* Permite clicks a través del div, excepto en los hijos */
+    /* Se extiende para centrar el texto entre el logo y el botón */
+    width: 100%; 
+    /* Se asegura que los elementos de la derecha tengan un Z-index alto */
+    z-index: 1001;
+    /* Aseguramos que la info se alinee al centro vertical */
+    padding-top: 10px; 
+    padding-bottom: 10px; 
+}
+
+/* Nuevo estilo para el título/texto en la parte superior */
+.app-title {
+    /* Eliminamos el posicionamiento absoluto y transform para usar el centrado de Flexbox del wrapper */
+    position: relative; 
+    left: auto;
+    transform: none; 
+    
+    color: var(--clr-text-content);
+    font-size: 1.2em;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    white-space: nowrap; /* Evita que el texto se rompa */
+    
+    /* Usamos la altura completa del contenedor padre para centrado vertical */
+    line-height: 1.2; 
+}
+
+.nav-header-info > * {
+     pointer-events: auto; /* Hace que los hijos (span, a, button) sean clicables */
+}
+
+.nav-header-info span {
+    color: var(--clr-text-content);
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+#theme-toggle {
+    /* Posicionamiento y Estilo */
+    background: none;
+    border: none;
+    color: var(--clr-text-content); /* Color del ícono basado en el tema */
+    cursor: pointer;
+    padding: 0; 
+    width: 38px;
+    height: 38px;
+    font-size: 1.8em; /* Tamaño del ícono */
+    
+    /* Usamos Flexbox para centrar el ícono dentro del área fija. */
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    
+    transition: color 0.3s, transform 0.2s;
+    /* z-index explícito para el botón */
+    z-index: 1001; /* Aseguramos que esté por encima del título */
+}
+#theme-toggle:hover {
+    transform: scale(1.1); /* Efecto hover */
+}
+/* Rotación del ícono de engranaje para hacerlo interactivo */
+#theme-toggle ion-icon {
+    /* CORRECCIÓN #2: Ajustamos el line-height y la alineación del ícono Ionicon */
+    line-height: normal; 
+    vertical-align: middle;
+    transition: transform 0.8s ease-in-out;
+    padding: 5px; /* Añadimos un pequeño padding al ícono para el "hitbox" táctil */
+}
+
+
+/* Contenedor principal de la navegación: Fijo y 100% de ancho */
+.navigation {
+    position: fixed; /* Lo fija en la pantalla */
+    bottom: 0; /* Lo coloca en el pie de la página */
+    
+    /* CENTRADO PERFECTO: */
+    left: 50%; /* Mueve el punto de inicio al 50% de la izquierda del viewport */
+    transform: translateX(-50%); /* Desplaza el elemento hacia la izquierda el 50% de su propio ancho */
+    /* Fin Centrado */
+    
+    width: 100%; /* Ocupa todo el ancho de la pantalla */
+    max-width: 450px; /* Limita el ancho en pantallas grandes (desktop) */
+    height: var(--nav-height);
+    background: var(--clr-nav-bg);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 0; 
+    border-top-left-radius: 15px; 
+    border-top-right-radius: 15px;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Asegura que esté por encima del contenido */
+    transition: background 0.3s; /* Suaviza el cambio de fondo de la barra */
+}
+
+.navigation ul {
+    display: flex;
+    width: 100%; 
+    padding: 0 10px;
+}
+
+.navigation ul li {
+    position: relative;
+    list-style: none;
+    width: 20%; 
+    flex-grow: 1;
+    height: var(--nav-height);
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.navigation ul li a {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    font-weight: 500;
+    text-decoration: none;
+    height: 100%; /* Asegura que el enlace ocupe todo el LI */
+}
+
+.navigation ul li a .icon {
+    position: relative;
+    display: block;
+    font-size: 1.5em;
+    text-align: center;
+    transition: 0.5s;
+    /* CAMBIO: Íconos inactivos usan la variable de color dinámica */
+    color: var(--clr-icon-inactive); 
+    padding-top: 18px; 
+    pointer-events: none; 
+}
+
+/* Transformación del ícono original (hacia arriba) */
+.navigation ul li.active a .icon {
+    transform: translateY(-32px);
+    /* Ocultamos completamente el ícono original */
+    opacity: 0;
+    padding-top: 0; 
+}
+
+.navigation ul li a .text {
+    position: absolute;
+    color: var(--clr-main);
+    font-weight: 600;
+    font-size: 0.75em;
+    letter-spacing: 0.05em;
+    transition: 0.5s;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Mostrar texto con color naranja cuando está activo */
+.navigation ul li.active a .text {
+    opacity: 1;
+    transform: translateY(10px);
+}
+
+/* --- Indicador de la Magia (Color Naranja) --- */
+.indicator {
+    position: absolute;
+    top: -50%;
+    width: 60px; 
+    height: 60px;
+    background: var(--clr-main);
+    border-radius: 50%;
+    border: 6px solid var(--clr-bg); /* Borde toma el color del fondo principal */
+    transition: 0.5s;
+    transform: translateX(0); /* Inicialmente centrado por JS */
+    
+    /* Configuración para centrar el ícono inyectado */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; 
+}
+
+/* Ícono inyectado que vive dentro del indicador */
+.indicator .dot-icon {
+    color: #000; /* Ícono negro dentro del círculo naranja */
+    font-size: 1.5em;
+    /* Transición más lenta para un fade suave */
+    opacity: 1; 
+    transition: opacity 1.0s ease-in-out; 
+    line-height: 1; 
+}
+
+
+/* Efecto de curva a la izquierda (corte) */
+.indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -22px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-top-right-radius: 20px;
+    box-shadow: 1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
+}
+
+/* Efecto de curva a la derecha (corte) */
+.indicator::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -22px;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border-top-left-radius: 20px;
+    box-shadow: -1px -10px 0 0 var(--clr-bg); /* Borde toma el color del fondo principal */
+}
+
+/* Contenido de ejemplo para ver el efecto fijo */
+.content {
+    /* ESTILOS DE CENTRADO MODIFICADOS PARA EL CONTENIDO */
+    padding: 20px;
+    color: var(--clr-text-content); 
+    text-align: center;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+    /* AÑADIDO: Transición de opacidad para el fade-in/out */
+    transition: opacity 0.2s ease-in-out, color 0.3s;
+    
+    /* NUEVOS ESTILOS PARA GESTIONAR EL ESPACIO */
+    /* Se establece el tamaño máximo del área disponible (Viewport - Navbar) */
+    max-height: calc(100vh - var(--nav-height) - 40px); /* Resta 40px de padding/margen superior e inferior */
+    /* Si el contenido excede el espacio vertical, permite scroll local */
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch; 
+    /* Se añade margen superior e inferior fijo para evitar solapamiento con la barra superior y la navegación */
+    padding-top: 65px; /* Para el header info */
+    padding-bottom: calc(var(--nav-height) + 20px); 
+
+    /* --- CAMBIO CLAVE PARA OCULTAR EL SCROLLBAR DEL CONTENEDOR PRINCIPAL --- */
+    /* Ocultar scrollbar de Webkit (Chrome, Safari) */
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    /* Ocultar scrollbar de IE and Edge */
+    -ms-overflow-style: none;  
+    /* Ocultar scrollbar de Firefox */
+    scrollbar-width: none;
+    /* ----------------------------------------------------------------------- */
+}
+
+/* Estado inicial al cargar la página */
+.content.page-loading {
+    opacity: 0;
+}
+
+/* Estado final después de que la página termina de cargar (se activa en JS) */
+.content.page-loaded {
+    opacity: 1;
+}
+
+.content h1 {
+    margin-bottom: 20px;
+}
+
+/* Estilos para formularios de Login/Registro */
+.auth-card {
+    background: none; /* ELIMINADO: Fondo para eliminar el efecto "card" */
+    padding: 0; /* ELIMINADO: Padding para que se extienda completamente */
+    border-radius: 0; /* ELIMINADO: Borde redondeado */
+    box-shadow: none; /* ELIMINADO: Sombra */
+    
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto; /* Asegura el centrado horizontal dentro de .content */
+}
+
+/* Ajustamos el padding de los inputs para mantener el espaciado visual */
+.auth-card .input-group {
+     margin-bottom: 25px;
+     /* Aseguramos que los inputs tomen el espacio del card anterior */
+     padding: 0 10px; 
+}
+
+.auth-card p {
+    /* Mantenemos el padding inferior para el texto */
+     padding: 0 10px; 
+}
+
+/* APLICAR ALINEACIÓN CENTRAL Y ESPACIADO DEL CONTENIDO DEL FORMULARIO */
+.auth-card form {
+     background: var(--clr-card-bg); /* Mantenemos el fondo del tema para que el formulario se vea en modo oscuro/claro */
+     padding: 30px; 
+     border-radius: 15px; 
+     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Una sombra muy ligera para destacarlo del fondo */
+}
+
+/* SOBREESCRIBIR el estilo del grupo de inputs para que no tengan padding extra */
+.auth-card form .input-group {
+     padding: 0;
+}
+
+.auth-card h1 {
+    /* Estilo para el título fuera del card/form */
+    margin-bottom: 30px !important;
+}
+
+
+.input-group {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--clr-text-content);
+    font-weight: 500;
+}
+
+.input-group input[type="text"],
+.input-group input[type="password"],
+.input-group input[type="email"] {
+    width: 100%;
+    padding: 12px 40px 12px 15px; /* Más padding a la derecha para el ícono */
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    /* CAMBIO: Usamos var(--clr-bg) para el fondo del input y var(--clr-text-content) para el color de la letra */
+    background: var(--clr-bg);
+    color: var(--clr-text-content);
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--clr-main);
+    outline: none;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(2px); /* Ajuste fino */
+    cursor: pointer;
+    color: #888;
+}
+.toggle-password:hover {
+    color: var(--clr-main);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--clr-main);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.3s, background-color 0.3s;
+    opacity: 1;
+}
+
+.btn-primary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Estilos para mensajes Flash */
+.alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.alert-success { background-color: #d4edda; color: #155724; }
+.alert-danger { background-color: #f8d7da; color: #721c24; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; }
+.alert-warning { background-color: #fff3cd; color: #856404; }
+
+
+/* ======================================================= */
+/* MEDIA QUERY: Tamaño de Logo para vista móvil (<= 350px) */
+/* ======================================================= */
+@media (max-width: 350px) {
+    /* 1. Modificar las variables CSS para reducir el tamaño del logo y el header */
+    :root {
+        --header-height: 60px; /* Reducimos ligeramente la altura total del header */
+        --logo-size: 45px; /* Nuevo tamaño del logo */
+    }
+
+    /* 2. Ajustar el padding del logo para mantener el margen */
+    .app-logo {
+        padding: 7px; /* Reducimos el padding */
+    }
+
+    /* 3. Ajustar la posición de los contenedores para alinearlos con el logo más pequeño */
+    .header-title-wrapper {
+        left: var(--logo-size); /* Se mueve a 45px */
+        height: var(--header-height); /* Nueva altura */
+    }
+
+    /* El contenedor derecho (nav-header-container) ya usa left: var(--logo-size) y height: var(--header-height) */
+    .nav-header-container {
+        height: var(--header-height); /* Nueva altura */
+    }
+    
+    /* Ajustamos el tamaño de la fuente del título si es necesario para pantallas pequeñas */
+    .app-title {
+        font-size: 1.1em;
+    }
+
+} /* Fin @media (max-width: 350px) */
