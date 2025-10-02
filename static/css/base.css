@@ -26,6 +26,12 @@
     
     /* NUEVA VARIABLE: Color específico para el texto de advertencia/instrucción */
     --clr-warning-text: var(--clr-warning); /* Por defecto en Dark, usa Warning */
+
+    /* NUEVA VARIABLE GLOBAL: Color del botón primario. Por defecto, es el clr-main */
+    --clr-btn-primary: var(--clr-main); 
+
+    /* NUEVA VARIABLE GLOBAL: Color de los enlaces principales (Registro, Olvidé Contraseña) */
+    --clr-link-primary: var(--clr-main); 
 }
 
 .theme-light {
@@ -37,17 +43,27 @@
     
     /* Regla del usuario: Dark en Light */
     --clr-warning-text: #222327; 
+    --clr-btn-primary: var(--clr-main); 
+    --clr-link-primary: var(--clr-main); 
 }
 
+/* --- AJUSTE DEL TEMA SEPIA --- */
+/* Nuevos valores para un Sepia más auténtico (beige cálido y marrón profundo) */
 .theme-sepia {
-    --clr-bg: #f8e5c8;
-    --clr-nav-bg: #f9f0e2;
-    --clr-text-content: #5c4033;
-    --clr-icon-inactive: #5c4033;
-    --clr-card-bg: #f9f0e2;
+    --clr-bg: #f7e8d2; /* Fondo principal: Beige cálido (Sepia claro) */
+    --clr-nav-bg: #eee0c6; /* Fondo de navegación/cards: Tono más oscuro/cálido */
+    --clr-text-content: #4e3d30; /* Texto: Marrón oscuro y legible */
+    --clr-icon-inactive: #4e3d30; /* Iconos inactivos: Marrón */
+    --clr-card-bg: #eee0c6; /* Consistencia con nav-bg */
 
-    /* Regla del usuario: Café en Sepia */
-    --clr-warning-text: #5c4033;
+    /* Regla del usuario: Marrón en Sepia */
+    --clr-warning-text: #4e3d30; 
+    
+    /* NUEVO: Color del botón primario en Sepia (Marrón cálido, más oscuro que el fondo beige) */
+    --clr-btn-primary: #5c4033; 
+
+    /* NUEVO: Color de enlace en Sepia (Marrón, usando el mismo color que el texto principal) */
+    --clr-link-primary: #4e3d30; 
 }
 
 .theme-dark {
@@ -59,6 +75,8 @@
     
     /* Regla del usuario: Warning en Dark (ya es el default, pero lo especificamos) */
     --clr-warning-text: var(--clr-warning); 
+    --clr-btn-primary: var(--clr-main); 
+    --clr-link-primary: var(--clr-main); 
 }
 /* ------------------------------------------- */
 /* FIN TEMAS */
@@ -524,6 +542,13 @@ body {
     margin-bottom: 30px !important;
 }
 
+/* NUEVA REGLA PARA TÍTULOS DE AUTENTICACIÓN */
+/* Usa el color de contenido del tema (marrón en sepia, blanco en dark) */
+h1.auth-title {
+    color: var(--clr-text-content);
+}
+/* FIN NUEVA REGLA */
+
 
 .input-group {
     position: relative;
@@ -567,17 +592,28 @@ body {
     color: var(--clr-main);
 }
 
+/* Modificamos para usar la nueva variable --clr-btn-primary */
 .btn-primary {
     width: 100%;
     padding: 12px;
-    background-color: var(--clr-main);
-    color: #000;
+    background-color: var(--clr-btn-primary); /* USA LA VARIABLE DEL TEMA */
+    color: #000; /* Texto negro para contraste, ya que el color es oscuro/claro */
     font-weight: bold;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     transition: opacity 0.3s, background-color 0.3s;
     opacity: 1;
+}
+/* Aseguramos que el color del texto del botón sea blanco en Sepia */
+.theme-sepia .btn-primary {
+    color: #ffffff;
+}
+
+/* --- NUEVA REGLA: Aplicar el color de enlace del tema a los enlaces de los formularios --- */
+/* (Se aplica a los enlaces en login.html y register.html fuera del formulario principal) */
+.auth-card a, .register-form-wrapper a, .auth-container a {
+    color: var(--clr-link-primary) !important; /* Usamos !important para asegurar que sobrescriba estilos inline si existen */
 }
 
 .btn-primary:disabled {
