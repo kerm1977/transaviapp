@@ -16,7 +16,7 @@
             </div>
             
             <!-- Nombre Completo y Usuario -->
-            <h2 class="text-3xl font-bold mb-1" style="color: var(--clr-main);">
+            <h2 class="text-3xl font-bold mb-1" style="color: var(--clr-text-content);">
                 {{ profile_data.full_name }}
             </h2>
             <p class="text-lg mb-6" style="color: var(--clr-text-content); opacity: 0.7;">
@@ -84,7 +84,7 @@
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('passwordChangeModal')">&times;</span>
             <h3 class="modal-title">Cambiar Contraseña</h3>
-            <p class="text-sm text-gray-500 mb-4">Ingresa tu contraseña actual y la nueva contraseña.</p>
+            <p class="text-sm text-gray-500 mb-4" style="color: var(--clr-text-content); opacity: 0.8;">Ingresa tu contraseña actual y la nueva contraseña.</p>
 
             <form action="{{ url_for('main.change_password') }}" method="POST">
                 
@@ -130,7 +130,7 @@
             <!-- Botón de Cierre -->
             <span class="close-button" onclick="closeModal('contactEditModal')">&times;</span>
             <h3 class="modal-title">Editar Perfil</h3>
-            <p class="text-sm text-gray-500 mb-4">Actualiza tu información personal y de contacto.</p>
+            <p class="text-sm text-gray-500 mb-4" style="color: var(--clr-text-content); opacity: 0.8;">Actualiza tu información personal y de contacto.</p>
 
             <!-- La ruta ahora apunta a la nueva función de Flask -->
             <form action="{{ url_for('main.update_profile_info') }}" method="POST">
@@ -203,14 +203,16 @@
 
     .profile-avatar {
         font-size: 5em;
-        color: var(--clr-main);
+        /* Usamos clr-text-content para que se vea bien en Dark, Light y Sepia */
+        color: var(--clr-text-content); 
         margin-bottom: 10px;
     }
 
     .profile-divider {
         border: 0;
         height: 1px;
-        background: var(--clr-text-content);
+        /* Usamos clr-text-content con opacidad para el separador */
+        background: var(--clr-text-content); 
         opacity: 0.3;
         margin: 25px 0;
     }
@@ -226,37 +228,62 @@
         display: flex;
         align-items: center;
         gap: 15px;
-        /* Se asume una variable RGB definida en base.css o se usa un valor fijo */
-        background: rgba(255, 153, 0, 0.05); 
+        /* CAMBIO CLAVE: Usamos las nuevas variables de detalle para el fondo y borde */
+        background: var(--clr-detail-bg); 
+        opacity: 1; /* Forzamos la opacidad máxima */
         padding: 12px 15px;
         border-radius: 8px;
-        border: 1px solid rgba(255, 153, 0, 0.2); 
+        /* Usamos un borde sutil para que se vea como un contenedor sólido */
+        border: 1px solid var(--clr-detail-bg); 
+        transition: background-color 0.3s;
     }
     
+    /* CAMBIO CLAVE: Forzamos el color del ícono al color de texto oscuro en Sepia */
     .detail-item ion-icon {
         font-size: 1.5em;
         min-width: 20px;
+        /* Usamos el color de texto del detalle para que sea CAFÉ OSCURO */
+        color: var(--clr-detail-text) !important; 
+        opacity: 1; 
+    }
+    
+    .detail-item:hover {
+        opacity: 0.8; /* Ligeramente más opaco al pasar el ratón */
+        background: var(--clr-detail-bg);
     }
 
     .detail-content {
         display: flex;
         flex-direction: column;
+        opacity: 1;
     }
 
+    /* ****************************************************************** */
+    /* CAMBIOS CLAVE: FORZAMOS EL COLOR OSCURO PARA EL TEXTO */
+    /* ****************************************************************** */
     .detail-label {
         font-size: 0.8em;
-        font-weight: 500;
-        color: var(--clr-warning);
+        font-weight: 700; 
+        /* Usamos la variable de texto del detalle para el CAFÉ OSCURO */
+        color: var(--clr-detail-text) !important; 
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        /* Aseguramos la máxima opacidad (visibilidad) */
+        opacity: 1 !important; 
     }
 
     .detail-value {
         font-size: 1em;
-        font-weight: 400;
-        color: var(--clr-text-content);
+        font-weight: 500; 
+        /* Usamos la variable de texto del detalle para el CAFÉ OSCURO */
+        color: var(--clr-detail-text) !important;
         word-break: break-all;
+        /* Aseguramos la máxima opacidad (visibilidad) */
+        opacity: 1 !important;
     }
+    /* ****************************************************************** */
+    /* FIN CAMBIOS CLAVE */
+    /* ****************************************************************** */
 
     .action-buttons {
         display: flex;
@@ -285,19 +312,20 @@
         font-size: 1.2em;
     }
 
-    /* Botón Secundario (Editar Info) */
+    /* Botón Secundario (Editar Info) - Usa Warning para diferenciarse del Main */
     .btn-secondary {
         background-color: var(--clr-warning);
-        color: #000;
+        /* En Sepia/Light, el texto es negro. En Dark, se mantiene negro para contraste. */
+        color: #000; 
     }
     .btn-secondary:hover {
         opacity: 0.9;
     }
 
-    /* Botón Principal (Cambiar Contraseña) */
+    /* Botón Principal (Cambiar Contraseña) - Usa el color principal del tema */
     .btn-main {
-        background-color: var(--clr-main); /* Usar el color principal */
-        color: white;
+        background-color: var(--clr-btn-primary); /* USA LA VARIABLE GLOBAL DEL TEMA */
+        color: #ffffff; /* Texto blanco para asegurar el contraste en Sepia/Dark */
     }
     .btn-main:hover {
         opacity: 0.9;
@@ -320,7 +348,7 @@
 
     /* --- Estilos del Modal (General) --- */
     .modal {
-        display: none; /* Oculto por defecto */
+        display: none; 
         position: fixed;
         z-index: 1000;
         left: 0;
@@ -335,27 +363,27 @@
     .modal-content {
         /* Usamos clr-card-bg para que se adapte al tema (oscuro, claro, sepia) */
         background-color: var(--clr-card-bg); 
-        margin: 5% auto; /* 5% desde arriba y centrado */
+        margin: 5% auto; 
         padding: 20px;
         border-radius: 12px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         max-width: 400px;
         width: 90%; 
         position: relative;
-        color: var(--clr-text-content); /* El texto dentro del modal usa el color de contenido del tema */
+        color: var(--clr-text-content); 
     }
     
     .modal-title {
-        color: var(--clr-main);
+        color: var(--clr-text-content); /* Título del modal usa el color de contenido */
         font-size: 1.5em;
         margin-bottom: 5px;
-        /* Asegurar que el título del modal usa el color de contenido en Sepia/Dark si es necesario */
-        color: var(--clr-text-content); 
     }
     /* El botón principal de Guardar/Actualizar en los modales */
     .modal-actions .btn-main {
+         background-color: var(--clr-btn-primary);
          color: white;
     }
+    /* El botón secundario de Guardar/Actualizar en los modales (Editar) */
     .modal-actions .btn-secondary {
          background-color: var(--clr-warning);
          color: #000;
@@ -363,14 +391,28 @@
     
     /* Asegurar que los inputs dentro del modal se adapten al tema */
     .modal-content input[type="email"], 
-    .modal-content input[type="text"] {
-        background: var(--clr-bg);
+    .modal-content input[type="text"],
+    .modal-content input[type="password"] {
+        /* Fondo del input: Usamos el fondo principal del body */
+        background: var(--clr-bg); 
         color: var(--clr-text-content);
+        border: 1px solid var(--clr-text-content); /* Borde que se adapte al tema */
+        opacity: 0.5;
+    }
+    
+    /* Etiqueta de input en modal (usamos clr-warning-text) */
+    .modal-content .input-group label {
+        color: var(--clr-warning-text);
+    }
+    /* Toggle password en modal */
+    .modal-content .toggle-password {
+        color: var(--clr-text-content);
+        opacity: 0.7;
     }
 
 
     .close-button {
-        color: #aaa;
+        color: var(--clr-text-content);
         float: right;
         font-size: 28px;
         font-weight: bold;
@@ -382,7 +424,7 @@
 
     .close-button:hover,
     .close-button:focus {
-        color: var(--clr-main); /* Usamos el color principal para el hover */
+        color: var(--clr-main); 
         text-decoration: none;
         cursor: pointer;
     }
@@ -398,7 +440,7 @@
         margin-bottom: 5px;
         font-weight: 500;
         font-size: 0.9em;
-        color: var(--clr-warning-text); /* Usamos el color de advertencia/instrucción */
+        color: var(--clr-warning-text); 
     }
     
     .password-input-wrapper {
@@ -409,7 +451,7 @@
 
     .password-input-wrapper input {
         width: 100%;
-        padding: 10px 40px 10px 10px; /* Espacio para el ícono */
+        padding: 10px 40px 10px 10px; 
         border: 1px solid #ccc;
         border-radius: 6px;
         box-sizing: border-box;
@@ -433,17 +475,20 @@
     
     .btn-cancel {
         padding: 10px 15px;
-        border: 1px solid #ccc;
         border-radius: 6px;
-        background-color: #eee;
-        color: #333;
+        /* Cancelar usa el fondo de la tarjeta/modal con un ligero borde */
+        background-color: var(--clr-card-bg); 
+        color: var(--clr-text-content);
         cursor: pointer;
         transition: background-color 0.2s;
-        border: none;
+        border: 1px solid var(--clr-text-content);
+        opacity: 0.5;
         font-weight: bold;
     }
     .btn-cancel:hover {
-        background-color: #ddd;
+        opacity: 1;
+        /* Fondo más oscuro */
+        background-color: var(--clr-bg); 
     }
 
 </style>

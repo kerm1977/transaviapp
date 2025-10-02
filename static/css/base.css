@@ -27,6 +27,10 @@
     /* NUEVA VARIABLE: Color específico para el texto de advertencia/instrucción */
     --clr-warning-text: var(--clr-warning); /* Por defecto en Dark, usa Warning */
 
+    /* NUEVAS VARIABLES PARA ITEM DE DETALLE (Perfil) */
+    --clr-detail-bg: #444444; /* Fondo del ítem en Dark (Gris Oscuro) */
+    --clr-detail-text: var(--clr-warning); /* Texto del ítem en Dark (Warning/Naranja) */
+
     /* NUEVA VARIABLE GLOBAL: Color del botón primario. Por defecto, es el clr-main */
     --clr-btn-primary: var(--clr-main); 
 
@@ -43,6 +47,11 @@
     
     /* Regla del usuario: Dark en Light */
     --clr-warning-text: #222327; 
+
+    /* VARIABLES PARA ITEM DE DETALLE EN LIGHT */
+    --clr-detail-bg: #e0e0e0; /* Fondo del ítem en Light (Gris Claro) */
+    --clr-detail-text: #222327; /* Texto del ítem en Light (Dark) */
+
     --clr-btn-primary: var(--clr-main); 
     --clr-link-primary: var(--clr-main); 
 }
@@ -52,18 +61,24 @@
 .theme-sepia {
     --clr-bg: #f7e8d2; /* Fondo principal: Beige cálido (Sepia claro) */
     --clr-nav-bg: #eee0c6; /* Fondo de navegación/cards: Tono más oscuro/cálido */
-    --clr-text-content: #4e3d30; /* Texto: Marrón oscuro y legible */
+    --clr-text-content: #2C1E15; /* Marrón muy profundo para MÁXIMO contraste general. */
     --clr-icon-inactive: #4e3d30; /* Iconos inactivos: Marrón */
     --clr-card-bg: #eee0c6; /* Consistencia con nav-bg */
 
-    /* Regla del usuario: Marrón en Sepia */
-    --clr-warning-text: #4e3d30; 
+    /* Usamos el color de texto principal, que ahora es más oscuro */
+    --clr-warning-text: var(--clr-text-content); 
+
+    /* ************************************************************ */
+    /* AJUSTE SOLICITADO POR EL USUARIO: CAFÉ CLARO y CAFÉ OSCURO */
+    /* ************************************************************ */
+    --clr-detail-bg: #D4B98E; /* Fondo del ítem en Sepia: Café Claro / Beige más oscuro y saturado */
+    --clr-detail-text: #4E3D30; /* Texto del ítem en Sepia: Café Oscuro */
     
     /* NUEVO: Color del botón primario en Sepia (Marrón cálido, más oscuro que el fondo beige) */
     --clr-btn-primary: #5c4033; 
 
     /* NUEVO: Color de enlace en Sepia (Marrón, usando el mismo color que el texto principal) */
-    --clr-link-primary: #4e3d30; 
+    --clr-link-primary: var(--clr-text-content); 
 }
 
 .theme-dark {
@@ -75,6 +90,11 @@
     
     /* Regla del usuario: Warning en Dark (ya es el default, pero lo especificamos) */
     --clr-warning-text: var(--clr-warning); 
+
+    /* VARIABLES PARA ITEM DE DETALLE EN DARK */
+    --clr-detail-bg: #444444; /* Fondo del ítem en Dark (Gris Oscuro) */
+    --clr-detail-text: var(--clr-warning); /* Texto del ítem en Dark (Warning/Naranja) */
+
     --clr-btn-primary: var(--clr-main); 
     --clr-link-primary: var(--clr-main); 
 }
