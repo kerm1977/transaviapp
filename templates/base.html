@@ -32,15 +32,19 @@
     </div>
     
     <!-- NUEVO WRAPPER CENTRADO CON Z-INDEX BAJO (1000) -->
+    <!-- Este es el contenedor principal que define el área del blur -->
     <div class="header-title-wrapper">
-        <!-- TÍTULO CENTRADO -->
-        <div class="app-title">TRANSAVI C.R.</div>
+        <!-- Contenedor para el efecto blur (capa de fondo) -->
+        <div class="app-title-backdrop"></div>
+        
+        <!-- TÍTULO CENTRADO (Capa de contenido) -->
+        <div class="app-title">TRANSAVI</div>
     </div>
 
 
     <!-- ESTRUCTURA 2: BARRA SUPERIOR CON TÍTULO Y BOTONES -->
     <div class="nav-header-container">
-        <!-- Barra Superior Derecha: Muestra solo el botón de tema (El saludo y el logout fueron eliminados para evitar superposición) -->
+        <!-- Barra Superior Derecha: Muestra solo el botón de tema -->
         <div class="nav-header-info">
             <!-- NOTA: El saludo y el botón de Cerrar Sesión fueron eliminados de aquí.
                  El cierre de sesión ahora se gestiona desde la página de perfil. -->

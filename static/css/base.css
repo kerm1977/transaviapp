@@ -115,7 +115,7 @@ body {
     width: var(--logo-size); /* Usando variable */
     height: var(--logo-size); /* Usando variable */
     object-fit: contain; 
-    z-index: 1001; 
+    z-index: 1001; /* Z-index alto para estar sobre el blur */
     padding: 10px; 
     pointer-events: none; 
     margin-top: 8px;
@@ -123,6 +123,7 @@ body {
 
 /* Contenedor principal de la barra superior, cubre el espacio entre el logo y la derecha */
 .nav-header-container {
+    /* Este contenedor se deja tal cual, pero sus elementos internos deben tener alto Z-index */
     position: fixed;
     top: 0;
     left: var(--logo-size); /* Inicia después del logo */
@@ -133,26 +134,92 @@ body {
     justify-content: flex-end; 
     z-index: 9999;
     padding-right: 15px; 
+    /* Quitamos el fondo porque lo pondrá el backdrop general */
+    background: none; 
 }
 
-/* Contenedor FLEX para centrar el título - AJUSTADO PARA CENTRADO PERFECTO */
+/* ======================================================= */
+/* ESTILOS DEL BLUR Y TÍTULO */
+/* ======================================================= */
+/* Nuevo: Este WRAPPER ahora es la barra desenfocada completa */
 .header-title-wrapper {
     position: fixed;
     top: 0;
-    left: var(--logo-size); /* Inicia después del logo (70px) */
-    right: 80px; /* Deja espacio para el botón de tema (38px) y padding (15px) */
-    height: var(--header-height); /* Ocupa la altura total del header */
+    left: 0; /* ¡Cubre desde el inicio de la pantalla! */
+    right: 0; /* ¡Cubre hasta el final de la pantalla! */
+    height: var(--header-height);
     
-    /* Centrado con Flexbox */
+    /* Centrado del título (ya no es relevante aquí, pero se mantiene la estructura) */
     display: flex;
     justify-content: center;
     align-items: center;
     
-    /* Z-index bajo para que no interfiera con el logo (1001) ni el botón (1001) */
-    z-index: 1000; 
+    /* Z-index bajo para que los botones y el logo floten encima */
+    z-index: 998; 
     
-    pointer-events: none; /* Permite clics a través del contenedor */
+    /* Necesitamos un ancho máximo para centrarlo con el body */
+    max-width: 450px; 
+    
+    /* Se debe centrar en pantallas grandes */
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Permitimos interacciones en la barra superior */
+    pointer-events: auto; 
+    overflow: hidden; 
+
+    /* AÑADIDO: Padding para hacer espacio al logo (izq) y al botón (der) */
+    padding-left: var(--logo-size); /* Espacio para el logo */
+    padding-right: 60px; /* Espacio para el botón de tema (38px + margen) */
 }
+
+/* Estilo para el contenedor de desenfoque (Glassmorphism) */
+.app-title-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Usamos el color de fondo de la barra de navegación con transparencia */
+    background-color: var(--clr-nav-bg); 
+    opacity: 0.85; /* Un poco más sólido */
+    z-index: -1; /* Mantiene la capa detrás del texto */
+    
+    /* Aplicamos el efecto de desenfoque */
+    backdrop-filter: blur(8px); /* Aumentamos el blur para que sea más visible */
+    -webkit-backdrop-filter: blur(8px); /* Soporte Webkit */
+    
+    /* CORRECCIÓN: Eliminamos los bordes redondeados inferiores */
+    border-bottom-left-radius: 0; 
+    border-bottom-right-radius: 0;
+    
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4); /* Sombra más fuerte */
+    transition: background-color 0.3s, backdrop-filter 0.3s, opacity 0.3s;
+}
+
+/* Aseguramos que el título esté en una posición superior */
+.app-title {
+    /* CORRECCIÓN: Usamos el centrado de Flexbox implícito en el wrapper */
+    position: relative; 
+    left: auto;
+    top: auto;
+    transform: none; 
+    
+    z-index: 1000; /* Alto Z-index para asegurar legibilidad */
+    pointer-events: none; /* Asegura que no bloquee el texto */
+    
+    /* Resto de estilos del título */
+    color: var(--clr-text-content);
+    font-size: 1.2em; /* Tamaño por defecto (ej. en desktop o móvil grande) */
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    white-space: nowrap; /* Evita que el texto se rompa */
+    line-height: 1.2; 
+}
+/* ======================================================= */
+/* FIN ESTILOS DEL BLUR Y TÍTULO */
+/* ======================================================= */
+
 
 /* Botón de cambio de tema y usuario (dentro del contenedor) */
 .nav-header-info {
@@ -162,32 +229,18 @@ body {
     align-items: center;
     justify-content: flex-end; /* Alinea los elementos a la derecha */
     gap: 15px;
-    pointer-events: none; /* Permite clicks a través del div, excepto en los hijos */
+    pointer-events: none; /* Permite clics a través del div, excepto en los hijos */
     /* Se extiende para centrar el texto entre el logo y el botón */
     width: 100%; 
     /* Se asegura que los elementos de la derecha tengan un Z-index alto */
-    z-index: 1001;
+    z-index: 1001; /* Alto Z-index para flotar sobre el blur */
     /* Aseguramos que la info se alinee al centro vertical */
     padding-top: 10px; 
     padding-bottom: 10px; 
 }
 
-/* Nuevo estilo para el título/texto en la parte superior */
-.app-title {
-    /* Eliminamos el posicionamiento absoluto y transform para usar el centrado de Flexbox del wrapper */
-    position: relative; 
-    left: auto;
-    transform: none; 
-    
-    color: var(--clr-text-content);
-    font-size: 1.2em;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    white-space: nowrap; /* Evita que el texto se rompa */
-    
-    /* Usamos la altura completa del contenedor padre para centrado vertical */
-    line-height: 1.2; 
-}
+/* El estilo de .app-title fue movido arriba a la sección del blur */
+/* .app-title { ... } */
 
 .nav-header-info > * {
      pointer-events: auto; /* Hace que los hijos (span, a, button) sean clicables */
@@ -400,7 +453,7 @@ body {
     overflow-y: auto; 
     -webkit-overflow-scrolling: touch; 
     /* Se añade margen superior e inferior fijo para evitar solapamiento con la barra superior y la navegación */
-    padding-top: 65px; /* Para el header info */
+    padding-top: calc(var(--header-height) + 10px); /* Ajustado para la nueva barra superior */
     padding-bottom: calc(var(--nav-height) + 20px); 
 
     /* --- CAMBIO CLAVE PARA OCULTAR EL SCROLLBAR DEL CONTENEDOR PRINCIPAL --- */
@@ -563,8 +616,20 @@ body {
 
     /* 3. Ajustar la posición de los contenedores para alinearlos con el logo más pequeño */
     .header-title-wrapper {
-        left: var(--logo-size); /* Se mueve a 45px */
+        left: 50%; /* Mantener centrado */
+        transform: translateX(-50%);
         height: var(--header-height); /* Nueva altura */
+        /* Eliminamos right: 70px */
+        right: 0;
+        
+        /* APLICAR PADDING RESPONSIVO */
+        padding-left: var(--logo-size); 
+        padding-right: 60px;
+    }
+
+    /* 4. Ajustar el tamaño de la fuente del título */
+    .app-title {
+        font-size: 0.8em; /* Reducido de 1.2em a 1.0em para pantallas <= 350px */
     }
 
     /* El contenedor derecho (nav-header-container) ya usa left: var(--logo-size) y height: var(--header-height) */
@@ -572,9 +637,4 @@ body {
         height: var(--header-height); /* Nueva altura */
     }
     
-    /* Ajustamos el tamaño de la fuente del título si es necesario para pantallas pequeñas */
-    .app-title {
-        font-size: 1.1em;
-    }
-
 } /* Fin @media (max-width: 350px) */
