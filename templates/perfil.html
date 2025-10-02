@@ -443,27 +443,34 @@
         color: var(--clr-warning-text); 
     }
     
+    /* 1. CAMBIO CLAVE: Usar Flexbox en el contenedor del input */
     .password-input-wrapper {
         position: relative;
         display: flex;
-        align-items: center;
+        align-items: center; /* ¡Centra verticalmente el contenido! */
     }
 
     .password-input-wrapper input {
+        /* 2. ELIMINAR el padding extra para que el alto lo controle el padding vertical */
         width: 100%;
         padding: 10px 40px 10px 10px; 
         border: 1px solid #ccc;
         border-radius: 6px;
         box-sizing: border-box;
+        /* Aseguramos que el input crezca para darle espacio al ícono */
+        flex-grow: 1; 
     }
     
-    /* Estilo para el ícono del ojo */
+    /* 3. CAMBIO CLAVE: Corregir el centrado del ícono del ojo */
     .toggle-password {
-        position: absolute;
+        position: absolute; /* Sigue siendo absoluto para superponerse */
         right: 10px;
         cursor: pointer;
         color: #888;
         font-size: 1.2em;
+        /* Eliminamos top: 50% y transform: translateY(2px) si existieran, y solo usamos las siguientes dos líneas: */
+        top: 50%; /* Mueve el punto de inicio a la mitad del contenedor */
+        transform: translateY(-50%); /* Lo mueve hacia arriba el 50% de su propia altura */
     }
     
     .modal-actions {
