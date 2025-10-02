@@ -40,17 +40,10 @@
 
     <!-- ESTRUCTURA 2: BARRA SUPERIOR CON TÍTULO Y BOTONES -->
     <div class="nav-header-container">
-        <!-- Barra Superior Derecha: Muestra el nombre del usuario y el botón de tema -->
+        <!-- Barra Superior Derecha: Muestra solo el botón de tema (El saludo y el logout fueron eliminados para evitar superposición) -->
         <div class="nav-header-info">
-            <!-- Mostrar nombre del usuario si está logueado -->
-            {% if session.logged_in %}
-                <span>Hola, {{ session.full_name.split(' ')[0] }}</span>
-                <a href="{{ url_for('auth.logout') }}" title="Cerrar Sesión" style="color: var(--clr-warning); font-size: 1.5em;">
-                    <ion-icon name="log-out-outline"></ion-icon>
-                </a>
-            {% else %}
-                <!-- Si no está logueado, se deja vacío o se pone un placeholder, pero el botón de tema permanece -->
-            {% endif %}
+            <!-- NOTA: El saludo y el botón de Cerrar Sesión fueron eliminados de aquí.
+                 El cierre de sesión ahora se gestiona desde la página de perfil. -->
 
             <!-- Botón de cambio de tema: AQUI NO SE PUEDE MOVER NI MODIFICAR ABSOLUTAMENTE NADA DE EL  -->
             <button id="theme-toggle" title="Cambiar Tema">
@@ -67,7 +60,7 @@
         <!-- Mostramos el título de la página si se pasó como argumento (para las nuevas rutas) -->
         {% if page_title and page_title != "Inicio" %}
             <h1 style="font-size: 2.5em; margin-bottom: 20px; color: var(--clr-main);">
-                <ion-icon name="{{ 'chatbubble-outline' if page_title == 'Mensajes' else ('camera-outline' if page_title == 'Fotos' else ('person-circle-outline' if page_title == 'Mi Perfil' else 'settings-outline')) }}" style="vertical-align: middle;"></ion-icon>
+                <ion-icon name="{{ 'chatbubble-outline' if page_title == 'Mensajes' else ('camera-outline' if page_title == 'Fotos' else 'settings-outline') }}" style="vertical-align: middle;"></ion-icon>
                 {{ page_title }}
             </h1>
             <p style="font-size: 1.1em; margin-bottom: 30px; color: var(--clr-text-content);">
@@ -94,8 +87,8 @@
                 </a>
             </li>
             
-            <!-- ENLACE DINÁMICO DE PERFIL/LOGIN (ACTUALIZADO) -->
-            <li class="list" data-icon-name="person-circle-outline" data-path="{{ 'profile' if session.logged_in else 'auth' }}">
+            <!-- ENLACE DINÁMICO DE PERFIL/LOGIN -->
+            <li class="list" data-icon-name="person-circle-outline" data-path="profile">
                 <!-- Único enlace que mantiene la lógica condicional -->
                 <a href="{{ url_for('main.profile') if session.logged_in else url_for('auth.login') }}">
                     <span class="icon">

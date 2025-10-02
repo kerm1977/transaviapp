@@ -29,10 +29,10 @@
                     TRANSPORTE DE ESTUDIANTES
                 </button>
             </div>
-
+            
             <!-- Contenido de Pestaña 1: Servicios Especiales -->
             <div id="especiales" class="tab-content active">
-                <p>Aquí puede solicitar vehículos para eventos, tours o traslados corporativos.</p>
+                <p>Solicite un viaje privado, corporativo o turístico con vehículos y rutas personalizadas.</p>
                 <a href="#" class="btn-primary service-button" style="margin-top: 20px;">
                     Solicitar Servicio Especial
                 </a>
@@ -49,30 +49,124 @@
         
     </div>
 
-    <!-- Secciones de Login/Logout (Solo si es necesario mantenerlas, ajustadas al final) -->
-    <div style="margin-top: 40px;">
-        {% if session.logged_in %}
-            <!-- Contenido para usuarios LOGUEADOS -->
-            <div style="padding: 15px; background: var(--clr-card-bg); border-radius: 10px; margin-bottom: 20px;">
-                <p style="font-size: 0.9em; color: var(--clr-text-content);">
-                    Bienvenido, <strong>{{ session.get('full_name', session.get('username', 'Usuario')) }}</strong>
-                </p>
-            </div>
-            <a href="{{ url_for('auth.logout') }}" class="btn-primary" style="background: var(--clr-warning);">
-                Cerrar Sesión
-            </a>
-            
-        {% endif %}
-    </div>
+    <!-- 
+        SECCIÓN ELIMINADA:
+        Se eliminó el bloque completo de saludo y botón de Cerrar Sesión 
+        para evitar superposición y redundancia en la página de inicio.
+    -->
 
 {% endblock %}
 
 {% block scripts %}
+<script>
+    // Función para manejar el cambio de pestañas (Tabs)
+    function openTab(evt, tabName) {
+        // Declarar todas las variables
+        var i, tabcontent, tablinks;
+
+        // Obtener todos los elementos con class="tab-content" y ocultarlos
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Obtener todos los elementos con class="tab-button" y remover la clase "active"
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Mostrar la pestaña actual y agregar la clase "active" al botón que la abrió
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    // Inicializar la primera pestaña al cargar
+    document.addEventListener("DOMContentLoaded", function() {
+        // Asegúrate de que solo la primera pestaña esté activa al inicio
+        // Esto previene un error si el usuario no hace clic.
+        document.querySelector('.tab-button').click();
+    });
+</script>
+
 <style>
+    /* Estilos específicos de index.html (solo para las pestañas y botones) */
+    
+    .service-selection-container {
+        padding: 20px 0;
+    }
+    
+    .tabs-container {
+        width: 100%;
+        max-width: 500px;
+        background: var(--clr-card-bg); /* Fondo de la tarjeta (blanco o gris oscuro) */
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid var(--clr-border);
+    }
+    
+    .tab-buttons {
+        display: flex;
+        justify-content: space-around;
+        border-bottom: 1px solid var(--clr-border);
+        background-color: var(--clr-bg); /* Un color de fondo para la barra de botones */
+    }
+    
+    .tab-button {
+        flex-grow: 1;
+        padding: 15px 10px;
+        border: none;
+        background: transparent;
+        color: var(--clr-text-content);
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.8em;
+        transition: background-color 0.3s, color 0.3s;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .tab-button:hover:not(.active) {
+        background-color: rgba(var(--clr-main-rgb), 0.1);
+    }
+    
+    .tab-button.active {
+        color: var(--clr-main);
+        /* Borde inferior para indicar la pestaña activa */
+        border-bottom: 3px solid var(--clr-main); 
+        background-color: var(--clr-card-bg);
+    }
+
+    .tab-content {
+        padding: 25px;
+        text-align: center;
+        color: var(--clr-text-content);
+    }
+
+    .tab-content p {
+        margin-bottom: 15px;
+        font-size: 1em;
+        color: var(--clr-text-secondary);
+    }
+
+    .service-button {
+        display: inline-block;
+        padding: 12px 25px;
+        font-weight: bold;
+        text-decoration: none;
+        border-radius: 8px;
+        /* Estilos primarios definidos en main.css */
+    }
+    
+    /* Media query para hacer los botones más pequeños en móvil */
+    @media (max-width: 400px) {
+        .tab-button {
+            font-size: 0.7em;
+            padding: 12px 5px;
+        }
+    }
 
 </style>
-
-<script>
-
-</script>
 {% endblock %}
