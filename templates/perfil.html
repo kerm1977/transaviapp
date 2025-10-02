@@ -33,7 +33,7 @@
                     <ion-icon name="mail-outline" style="color: var(--clr-warning);"></ion-icon>
                     <div class="detail-content">
                         <span class="detail-label">Correo Electrónico</span>
-                        <span class="detail-value">{{ profile_data.email }}</span>
+                        <span class="detail-value" id="profile-email">{{ profile_data.email }}</span>
                     </div>
                 </div>
 
@@ -42,7 +42,7 @@
                     <ion-icon name="call-outline" style="color: var(--clr-warning);"></ion-icon>
                     <div class="detail-content">
                         <span class="detail-label">Teléfono</span>
-                        <span class="detail-value">{{ profile_data.telefono }}</span>
+                        <span class="detail-value" id="profile-telefono">{{ profile_data.telefono }}</span>
                     </div>
                 </div>
                 
@@ -60,11 +60,12 @@
 
             <!-- Botones de Acción -->
             <div class="action-buttons mt-6">
-                <a href="#" class="btn-secondary">
+                <!-- MODIFICADO: Ahora abre el modal de edición de perfil completo -->
+                <button type="button" class="btn-secondary" onclick="openModal('contactEditModal')">
                     <ion-icon name="create-outline"></ion-icon> Editar Información
-                </a>
+                </button>
                 
-                <!-- NUEVO: Botón para abrir el modal de cambio de contraseña -->
+                <!-- Botón para abrir el modal de cambio de contraseña -->
                 <button type="button" class="btn-main" onclick="openModal('passwordChangeModal')">
                     <ion-icon name="lock-closed-outline"></ion-icon> Cambiar Contraseña
                 </button>
@@ -78,7 +79,7 @@
 
     </div>
 
-    <!-- INICIO: Modal para Cambiar Contraseña -->
+    <!-- INICIO: Modal para Cambiar Contraseña (Existente) -->
     <div id="passwordChangeModal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal('passwordChangeModal')">&times;</span>
@@ -122,6 +123,57 @@
         </div>
     </div>
     <!-- FIN: Modal para Cambiar Contraseña -->
+    
+    <!-- INICIO: NUEVO MODAL para Editar Información de Contacto y Usuario -->
+    <div id="contactEditModal" class="modal">
+        <div class="modal-content">
+            <!-- Botón de Cierre -->
+            <span class="close-button" onclick="closeModal('contactEditModal')">&times;</span>
+            <h3 class="modal-title">Editar Perfil</h3>
+            <p class="text-sm text-gray-500 mb-4">Actualiza tu información personal y de contacto.</p>
+
+            <!-- La ruta ahora apunta a la nueva función de Flask -->
+            <form action="{{ url_for('main.update_profile_info') }}" method="POST">
+                
+                <!-- Campo Segundo Apellido (Opcional) -->
+                <div class="input-group">
+                    <label for="edit_apellido2">Segundo Apellido (Opcional)</label>
+                    <!-- Usamos profile_data.apellido2 que ya se pasó desde app.py -->
+                    <input type="text" id="edit_apellido2" name="segundo_apellido" 
+                           value="{{ profile_data.apellido2 or '' }}" 
+                           pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ]*">
+                </div>
+                
+                <!-- Campo Nombre de Usuario -->
+                <div class="input-group">
+                    <label for="edit_usuario">Nombre de Usuario (5-15 caracteres)</label>
+                    <input type="text" id="edit_usuario" name="usuario" value="{{ profile_data.username }}" 
+                           pattern="[a-zA-Z0-9]{5,15}" required>
+                </div>
+                
+                <hr class="profile-divider" style="opacity: 0.1; margin: 15px 0;">
+                
+                <!-- Campo Correo Electrónico (Contacto) -->
+                <div class="input-group">
+                    <label for="edit_email">Correo Electrónico</label>
+                    <input type="email" id="edit_email" name="email" value="{{ profile_data.email }}" required>
+                </div>
+
+                <!-- Campo Teléfono (Contacto) -->
+                <div class="input-group">
+                    <label for="edit_telefono">Teléfono (8 dígitos)</label>
+                    <input type="text" id="edit_telefono" name="telefono" value="{{ profile_data.telefono }}" 
+                           pattern="[0-9]{8}" maxlength="8" required>
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('contactEditModal')">Cancelar</button>
+                    <button type="submit" class="btn-secondary">Actualizar Perfil</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- FIN: NUEVO MODAL para Editar Información de Contacto y Usuario -->
 
 {% endblock %}
 
@@ -266,7 +318,7 @@
         }
     }
 
-    /* --- Estilos del Modal --- */
+    /* --- Estilos del Modal (General) --- */
     .modal {
         display: none; /* Oculto por defecto */
         position: fixed;
@@ -281,7 +333,8 @@
     }
 
     .modal-content {
-        background-color: #fefefe;
+        /* Usamos clr-card-bg para que se adapte al tema (oscuro, claro, sepia) */
+        background-color: var(--clr-card-bg); 
         margin: 5% auto; /* 5% desde arriba y centrado */
         padding: 20px;
         border-radius: 12px;
@@ -289,14 +342,32 @@
         max-width: 400px;
         width: 90%; 
         position: relative;
-        color: var(--clr-text-content);
+        color: var(--clr-text-content); /* El texto dentro del modal usa el color de contenido del tema */
     }
     
     .modal-title {
         color: var(--clr-main);
         font-size: 1.5em;
         margin-bottom: 5px;
+        /* Asegurar que el título del modal usa el color de contenido en Sepia/Dark si es necesario */
+        color: var(--clr-text-content); 
     }
+    /* El botón principal de Guardar/Actualizar en los modales */
+    .modal-actions .btn-main {
+         color: white;
+    }
+    .modal-actions .btn-secondary {
+         background-color: var(--clr-warning);
+         color: #000;
+    }
+    
+    /* Asegurar que los inputs dentro del modal se adapten al tema */
+    .modal-content input[type="email"], 
+    .modal-content input[type="text"] {
+        background: var(--clr-bg);
+        color: var(--clr-text-content);
+    }
+
 
     .close-button {
         color: #aaa;
@@ -311,7 +382,7 @@
 
     .close-button:hover,
     .close-button:focus {
-        color: #000;
+        color: var(--clr-main); /* Usamos el color principal para el hover */
         text-decoration: none;
         cursor: pointer;
     }
@@ -327,7 +398,7 @@
         margin-bottom: 5px;
         font-weight: 500;
         font-size: 0.9em;
-        color: var(--clr-main);
+        color: var(--clr-warning-text); /* Usamos el color de advertencia/instrucción */
     }
     
     .password-input-wrapper {
@@ -365,8 +436,11 @@
         border: 1px solid #ccc;
         border-radius: 6px;
         background-color: #eee;
+        color: #333;
         cursor: pointer;
         transition: background-color 0.2s;
+        border: none;
+        font-weight: bold;
     }
     .btn-cancel:hover {
         background-color: #ddd;
@@ -386,9 +460,16 @@
 
     // Cierra el modal si el usuario hace clic fuera de él
     window.onclick = function(event) {
-        const modal = document.getElementById('passwordChangeModal');
-        if (event.target == modal) {
-            modal.style.display = "none";
+        const passwordModal = document.getElementById('passwordChangeModal');
+        const contactModal = document.getElementById('contactEditModal');
+        
+        // Cierre para el modal de Contraseña
+        if (event.target == passwordModal) {
+            passwordModal.style.display = "none";
+        }
+        // Cierre para el modal de Contacto
+        if (event.target == contactModal) {
+            contactModal.style.display = "none";
         }
     }
 

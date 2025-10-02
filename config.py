@@ -132,3 +132,38 @@ def update_user_password(user_id, new_password_hash):
         return False
     finally:
         conn.close()
+
+def update_user_profile_info(user_id, segundo_apellido, usuario, email, telefono):
+    """Actualiza el segundo apellido, usuario, email y teléfono del usuario."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            '''
+            UPDATE users SET 
+                segundo_apellido = ?,
+                usuario = ?,
+                email = ?,
+                telefono = ?
+            WHERE id = ?
+            ''',
+            (segundo_apellido, usuario, email, telefono, user_id)
+        )
+        conn.commit()
+        return True
+    except IntegrityError as e:
+        conn.close()
+        error_message = str(e)
+        if 'email' in error_message:
+            return 'email_exists'
+        elif 'usuario' in error_message:
+            return 'username_exists'
+        elif 'telefono' in error_message:
+            return 'phone_exists'
+        else:
+            return 'integrity_error'
+    except Exception as e:
+        print(f"Error al actualizar la información de perfil del usuario {user_id}: {e}")
+        return 'general_error'
+    finally:
+        conn.close()

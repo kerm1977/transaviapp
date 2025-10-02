@@ -4,7 +4,7 @@ import re
 from functools import wraps
 
 # Importa las funciones de conexión/lógica de la base de datos
-from config import get_user_by_email_or_username, register_user, init_db, get_user_by_id, update_user_password # Importamos update_user_password
+from config import get_user_by_email_or_username, register_user, init_db, get_user_by_id, update_user_password, update_user_profile_info # USAMOS update_user_profile_info
 
 # Inicialización de la base de datos (asegura que db.db exista con la tabla)
 init_db()
@@ -179,13 +179,14 @@ def profile():
         if user_data['segundo_apellido']:
             full_name += f" {user_data['segundo_apellido']}"
             
-        # Pasar solo los datos necesarios al template
+        # Pasar todos los datos necesarios al template, incluyendo el segundo apellido
         profile_data = {
             'full_name': full_name,
             'username': user_data['usuario'],
             'email': user_data['email'],
             'telefono': user_data['telefono'],
-            'id': user_data['id']
+            'id': user_data['id'],
+            'apellido2': user_data['segundo_apellido'] # Pasamos el segundo apellido aquí
         }
         # IMPORTANTE: Ya NO pasamos page_title="Mi Perfil" para evitar la cabecera duplicada.
         return render_template('perfil.html', profile_data=profile_data)
@@ -238,6 +239,47 @@ def change_password():
         flash('Ocurrió un error al intentar actualizar la contraseña.', 'danger')
         return redirect(url_for('main.profile'))
 
+@main_bp.route('/update_profile_info', methods=['POST'])
+@is_logged_in
+def update_profile_info():
+    """Ruta para actualizar email, teléfono, usuario y segundo apellido."""
+    user_id = session.get('user_id')
+    segundo_apellido = request.form.get('segundo_apellido', '')
+    usuario = request.form['usuario']
+    email = request.form['email']
+    telefono = request.form['telefono']
+    
+    # 1. Validación de formato de datos (ej. teléfono 8 dígitos)
+    if not re.fullmatch(r'^\d{8}$', telefono):
+         flash('El Teléfono debe contener exactamente 8 dígitos numéricos.', 'danger')
+         return redirect(url_for('main.profile'))
+         
+    # 2. Validación de usuario (alfanumérico y longitud)
+    if not re.fullmatch(r'^[a-zA-Z0-9]{5,15}$', usuario):
+         flash('El Nombre de Usuario debe ser alfanumérico y tener entre 5 y 15 caracteres.', 'danger')
+         return redirect(url_for('main.profile'))
+
+    # 3. Intentar actualizar en la DB
+    # Limpiamos el segundo apellido si es necesario antes de enviarlo
+    segundo_apellido_clean = format_title_case(segundo_apellido) if segundo_apellido else ''
+
+    result = update_user_profile_info(user_id, segundo_apellido_clean, usuario, email, telefono)
+    
+    if result is True:
+        # Actualizar la sesión para que el nuevo username aparezca en la navbar inmediatamente
+        session['username'] = usuario
+        flash('Información de perfil actualizada exitosamente.', 'success')
+        return redirect(url_for('main.profile'))
+    elif result == 'email_exists':
+        flash('El nuevo Email ya está registrado por otro usuario.', 'danger')
+    elif result == 'username_exists':
+        flash('El nuevo Nombre de Usuario ya está registrado por otro usuario.', 'danger')
+    elif result == 'phone_exists':
+        flash('El nuevo Teléfono ya está registrado por otro usuario.', 'danger')
+    else:
+        flash('Ocurrió un error al intentar actualizar la información.', 'danger')
+
+    return redirect(url_for('main.profile'))
 
 # NUEVAS RUTAS DE NAVEGACIÓN (Públicas)
 @main_bp.route('/messages')

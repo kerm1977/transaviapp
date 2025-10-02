@@ -8,8 +8,12 @@ FINALIZADOS---------------------------------------
 
 
 5. Cambiar Contraseña
-
+6. Mejorar Apariencia de Sepia
 7. Que sea PWA
+
+
+
+
 
 --------------------------------------------------
 PENDIENTES---------------------------------------
@@ -18,7 +22,7 @@ PENDIENTES---------------------------------------
 3. Si existe el usuario cargar la información para solicitar un nuevo servicio 
 4. Editar información del Usuario (Superusuario Todos) Usuario regular y administrador(Edita no borra)
 
-6. Mejorar Apariencia de Sepia
+
 
 8. Area de Colaboradores (área de colaboradores)
 9. Agregar una historial de Solicitudes usuario activo y ver más (editar y borrar)
