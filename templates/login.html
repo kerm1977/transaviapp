@@ -3,91 +3,6 @@
 
 {% block title %}Iniciar Sesión{% endblock %}
 
-{% block head_styles %}
-<style>
-    /* Estilos para reemplazar el efecto Card y centrar el formulario */
-    .auth-container {
-        /* Centrado en la página */
-        max-width: 450px;
-        width: 90%;
-        margin: 40px auto; /* Agrega margen superior/inferior para espaciamiento */
-        padding: 0; /* Elimina el padding del card */
-        /* Eliminación del efecto card */
-        background: transparent;
-        box-shadow: none;
-        border-radius: 0;
-    }
-    
-    /* Mantener los estilos de input y botones */
-    .input-group {
-        margin-bottom: 20px;
-        position: relative;
-    }
-
-    .input-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: 500;
-        color: var(--clr-text-secondary);
-    }
-
-    .input-group input[type="text"],
-    .input-group input[type="password"],
-    .input-group input[type="email"],
-    .input-group input[type="tel"] {
-        width: 100%;
-        padding: 12px 10px;
-        border: 1px solid var(--clr-border);
-        border-radius: 6px;
-        background-color: var(--clr-background-alt);
-        color: var(--clr-text-primary);
-        transition: border-color 0.3s;
-    }
-
-    .input-group input:focus {
-        border-color: var(--clr-main);
-        outline: none;
-    }
-    
-    .toggle-password {
-        position: absolute;
-        right: 10px;
-        top: 60%; /* Ajustar la posición vertical del ojo */
-        transform: translateY(-50%);
-        cursor: pointer;
-        color: var(--clr-text-secondary);
-    }
-
-    .btn-primary {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 6px;
-        background-color: var(--clr-main);
-        color: #000;
-        font-size: 1.1em;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.1s;
-    }
-
-    .btn-primary:hover {
-        background-color: var(--clr-warning);
-    }
-    
-    /* El contenedor principal ya tiene min-h-screen en base.html, 
-       pero agregamos flexibilidad para centrar en el bloque de contenido si es necesario */
-    .mainContent {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* Alineación arriba para que no flote en la mitad */
-        min-height: 100vh;
-        padding-top: 50px; /* Espacio superior */
-    }
-
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="auth-container">
     <h1 style="text-align: center; color: var(--clr-main); margin-bottom: 25px;">Iniciar Sesión</h1>
@@ -132,21 +47,4 @@
     </p>
 
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    // Función para mostrar/ocultar la contraseña
-    function togglePasswordVisibility(fieldId) {
-        const field = document.getElementById(fieldId);
-        const icon = document.getElementById(`icon-${fieldId}`);
-        if (field.type === "password") {
-            field.type = "text";
-            icon.name = "eye-outline";
-        } else {
-            field.type = "password";
-            icon.name = "eye-off-outline";
-        }
-    }
-</script>
 {% endblock %}

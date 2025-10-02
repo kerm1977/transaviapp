@@ -1,0 +1,91 @@
+    <!-- NUEVO WRAPPER CENTRADO CON Z-INDEX BAJO (1000) -->
+    <!-- Este es el contenedor principal que define el área del blur -->
+    <div class="header-title-wrapper">
+        <!-- Contenedor para el efecto blur (capa de fondo) -->
+        <div class="app-title-backdrop"></div>
+        
+        <!-- TÍTULO CENTRADO (Capa de contenido) -->
+        <div class="app-title">TRANSAVI</div>
+    </div>
+
+
+    <!-- ESTRUCTURA 2: BARRA SUPERIOR CON TÍTULO Y BOTONES -->
+    <div class="nav-header-container">
+        <!-- Barra Superior Derecha: Muestra solo el botón de tema -->
+        <div class="nav-header-info">
+            <!-- NOTA: El saludo y el botón de Cerrar Sesión fueron eliminados de aquí.
+                 El cierre de sesión ahora se gestiona desde la página de perfil. -->
+
+            <!-- Botón de cambio de tema: AQUI NO SE PUEDE MOVER NI MODIFICAR ABSOLUTAMENTE NADA DE EL  -->
+            <button id="theme-toggle" title="Cambiar Tema">
+                <ion-icon name="color-palette-outline"></ion-icon>
+            </button>
+        </div>
+    </div>
+
+
+
+<!-- ======================================================= -->
+<!-- ESTRUCTURA HTML - NAVBAR INFERIOR (SIEMPRE VISIBLE) -->
+<!-- ======================================================= -->
+<div class="navigation">
+    <ul>
+        <!-- Elementos de la lista -->
+        <li class="list active" data-icon-name="home-outline" data-path="index">
+            <a href="{{ url_for('main.index') }}">
+                <span class="icon">
+                    <ion-icon name="home-outline"></ion-icon>
+                </span>
+                <span class="text">Inicio</span>
+            </a>
+        </li>
+        
+        <!-- ENLACE DINÁMICO DE PERFIL/LOGIN -->
+        <li class="list" data-icon-name="person-circle-outline" data-path="profile">
+            <!-- Único enlace que mantiene la lógica condicional -->
+            <a href="{{ url_for('main.profile') if session.logged_in else url_for('auth.login') }}">
+                <span class="icon">
+                    <ion-icon name="person-circle-outline"></ion-icon>
+                </span>
+                <span class="text">
+                    {% if session.logged_in %}Perfil{% else %}Acceder{% endif %}
+                </span>
+            </a>
+        </li>
+        
+        <!-- ENLACE A MENSAJES (Ruta directa) -->
+        <li class="list" data-icon-name="chatbubble-outline" data-path="messages">
+            <a href="{{ url_for('main.messages') }}">
+                <span class="icon">
+                    <ion-icon name="chatbubble-outline"></ion-icon>
+                </span>
+                <span class="text">Mensajes</span>
+            </a>
+        </li>
+        
+        <!-- ENLACE A FOTOS (Ruta directa) -->
+        <li class="list" data-icon-name="camera-outline" data-path="photos">
+            <a href="{{ url_for('main.photos') }}">
+                <span class="icon">
+                    <ion-icon name="camera-outline"></ion-icon>
+                </span>
+                <span class="text">Fotos</span>
+            </a>
+        </li>
+        
+        <!-- ENLACE A AJUSTES (Ruta directa) -->
+        <li class="list" data-icon-name="settings-outline" data-path="settings">
+            <a href="{{ url_for('main.settings') }}">
+                <span class="icon">
+                    <ion-icon name="settings-outline"></ion-icon>
+                </span>
+                <span class="text">Ajustes</span>
+            </a>
+        </li>
+
+        <!-- INDICADOR: Ahora solo contendrá el ícono activo inyectado por JS -->
+        <div class="indicator">
+            <!-- Ícono de reemplazo. Se inyecta aquí con JS -->
+        </div>
+    </ul>
+</div>

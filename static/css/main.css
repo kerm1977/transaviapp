@@ -1,5 +1,8 @@
 @import url('base.css');
 @import url('index.css');
+@import url('login.css');
+@import url('register.css');
+
 @import url('all.min.css');
 /*FUENTES*/
 @import url('../webfonts/css/all.min.css');

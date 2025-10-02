@@ -1,26 +1,75 @@
-Hola necesito crear una aplicación en flask que se conecte a una base de datos sqlite
-Esta base de datos debe llamarse db.db
-esta debe estar al mismo nivel de app.py
+correcciones
 
-app.py va a contener absolutamente toda la lógica de la aplicación y utilizar blueprints
-
-
-todas las vistas van a heredear de base.html
-
-al ejecutar la app tiene que dirigirse automáticamente a index.html que hereda de base.html
-
-vas a crear un login.html que permita loguarse con email y contraseña. Contraseña debe tener un ojo para verla
-tambien un botón de recordar contraseña un enlace que lleve a register.html y otro que mantenga la sesión activa
-si al loguearse todo es correcto se dirige a index.html
-Si el usuario se registra, debe aparecer el nombre arriba a la par de botón del tema
-
-vas a crear un register.html que permita registrar usuarios con el Nombre, Primer Apellido, Segundo Apellido, Teléfono, Email, Usuario, (Contraseña, Verificar contraseña) estos dos últimos con ojo para ver las contraseñas y un enlace que diga, ya tengo una cuenta.
-en esta misma vista van a validarse de la siguiente forma
-Nombre (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
-Primer Apellido (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
-Segundo Apellido (va a tener formato Title que se aplique automáticamente y no acepta espacios, números, ni caracteres especias ni de puntuación)
-Teléfono (No va a permitir escribir letras ni caracteres especiales ni de puntación, solo puede contener 8 caracteres y no menos de 8 caracteres)
-Usuario (No va a permitir escribir más de 10 caracteres, y aparece una validación indicando si el usuario es valido o no)
+--------------------------------------------------
+FINALIZADOS---------------------------------------
+--------------------------------------------------
+1. Bajar formulario de login al centro en vista PC
 
 
-TODO LO RELACIONADO A LOS USUARIO REGISTRADOS CONECCION DE LA BASE DE DATOS VA A ESTAR DENTRO DE config.py
+
+--------------------------------------------------
+PENDIENTES---------------------------------------
+--------------------------------------------------
+2. Reutilizar el formulario de Registro para solicitar un servicio y autogenerar usuario
+3. Si existe el usuario cargar la información para solicitar un nuevo servicio 
+4. Editar información del Usuario (Superusuario Todos) Usuario regular y administrador(Edita no borra)
+5. Cambiar Contraseña
+6. Mejorar Apariencia de Sepia
+7. Que sea PWA
+8. Area de Colaboradores (área de colaboradores)
+9. Agregar una historial de Solicitudes usuario activo y ver más (editar y borrar)
+10. Deseas unirte a TRANSAVI?? Formulario con otros datos como Tipo de Vehiculo, Marca, Capacidad..etc
+
+
+
+
+Formulario de solicitud del área de servicios especiales
+
+	Requiere un servicios para: select(Empresa, Equipo Deportivo, Comparsa, Turismo, Senderismo, Otro)
+	Si Requiere un servicios == Otro, aparece un input que diga... Que tipo de servicio requiere?
+
+	Datos del Solicitante
+		Nombre
+		Primer Apellido
+		Segundo Apellido
+		Teléfono (8 dígitos):
+		Email:
+		Nombre de Usuario (5-15 caracteres): (si no agrega uno, Autogenera uno)
+		Contraseña (Mín. 8 caracteres): (si no agrega uno, Autogenera una)
+		Confirmar Contraseña: (si no agrega uno, Autogenera una)
+
+	Datos del Viaje
+		Desde 
+			Provincia()
+			Más detalles
+			select que pregunte Es solo un día? (si, no)
+			Hora:
+			Fecha de la ida:
+			si Es solo un día es == NO... aparece un input datapick que diga: Fecha en el área de Hasta
+			Punto de Encuentro: 
+				Enlace(Waze, Google Maps) Al seleccionar el enlace debe abrir la plataforma según
+
+		Hasta
+			Provincia()
+			Más detalles
+			Hora:
+			Fecha:<-- Este solo aparece si Es solo un día es == NO
+			Punto de Encuentro: 
+				Enlace(Waze, Google Maps) Al seleccionar el enlace debe abrir la plataforma según
+	
+	Al Guardar la solicitud debe permitir exportar a pdf, jpg con un código de barra y la información absoluta de toda la solicitud y enviarla por whatsapp ordenada y legible
+	También Cancelar la solicitud (1 semana antes NO se puede), Editarla y borrar la solicitud
+
+
+
+	
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 /* Estilos específicos para la sección de pestañas */
 .service-selection-container {
-    padding-top: 20px;
+    padding-top: 100px;
 }
 .main-title {
     text-shadow: 0 0 5px rgba(255, 153, 0, 0.4);
@@ -17,10 +17,14 @@
 
 
 @media (max-width: 768px) {
-.main-title {
-    text-shadow: 0 0 5px rgba(255, 153, 0, 0.4);
-    margin-top: 30px;
-}
+    .main-title {
+        text-shadow: 0 0 5px rgba(255, 153, 0, 0.4);
+        margin-top: 30px;
+    }
+
+    .service-selection-container {
+        padding-top: 20px;
+    }
 }
 
 .tabs-container {
@@ -91,3 +95,4 @@
 .service-button:hover {
     background-color: var(--clr-warning);
 }
+
